@@ -12,7 +12,7 @@ struct Status: Identifiable, CustomStringConvertible {
     var name: String
 
     var description: String {
-        return #"{ id: \#(id), name: "\#(name)" }"#
+        return #"Status(id: \#(id), name: "\#(name)")"#
     }
 
     init(id: Int, name: String) {

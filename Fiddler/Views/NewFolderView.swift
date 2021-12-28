@@ -53,9 +53,3 @@ struct NewFolderView: View {
         .fixedSize()
     }
 }
-
-struct NewFolderView_Previews: PreviewProvider {
-    static var previews: some View {
-        NewFolderView()
-    }
-}

@@ -8,7 +8,9 @@
 import CoreData
 import OSLog
 
-class AppState: NSObject, ObservableObject {
+fileprivate let logger = Logger("AppState")
+
+final class AppState: NSObject, ObservableObject {
 
     @Published var status = [Status]()
     @Published var selectedStatus: Int? = 1
@@ -19,7 +21,7 @@ class AppState: NSObject, ObservableObject {
     @Published var error: Error?
     @Published var hasError = false
 
-    private let logger = Logger("AppState")
+
 
     private lazy var statusCursor: NSFetchedResultsController<StatusMO> = {
         let fetcher = StatusMO.fetchRequest()
@@ -48,6 +50,10 @@ class AppState: NSObject, ObservableObject {
         } catch (let error) {
             await set(error: error)
         }
+    }
+
+    func save(project: Project) async {
+        logger.debug("Save → \(project)")
     }
 
     @MainActor

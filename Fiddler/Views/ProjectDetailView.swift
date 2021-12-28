@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// @TODO: Show the whole project. When clicking "new" project, create a new one with a default title, then render it in this view where you can save it. Buttons along the bottom. Fill in the title along the topic. No need for a "sheet" for this one.
+
 struct ProjectDetailView: View {
     var body: some View {
         VStack {

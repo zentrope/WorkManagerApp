@@ -12,7 +12,7 @@ struct Folder: Identifiable, CustomStringConvertible, Hashable {
     var name: String
 
     var description: String {
-        return #"{ id: "\#(id)", name: "\#(name)" }"#
+        return #"Folder(id: \#(id), name: "\#(name)")"#
     }
 
     init(name: String) {

@@ -25,6 +25,7 @@
 		53F0B18D277A4D98002BB3EA /* Logger+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F0B18C277A4D98002BB3EA /* Logger+Ext.swift */; };
 		53F0B18F277A86CC002BB3EA /* NewFolderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F0B18E277A86CC002BB3EA /* NewFolderView.swift */; };
 		53F0B191277A88B8002BB3EA /* Folder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F0B190277A88B8002BB3EA /* Folder.swift */; };
+		53F9F0FB277AF0DD001A7817 /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F9F0FA277AF0DD001A7817 /* Project.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +49,7 @@
 		53F0B18C277A4D98002BB3EA /* Logger+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Logger+Ext.swift"; sourceTree = "<group>"; };
 		53F0B18E277A86CC002BB3EA /* NewFolderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewFolderView.swift; sourceTree = "<group>"; };
 		53F0B190277A88B8002BB3EA /* Folder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Folder.swift; sourceTree = "<group>"; };
+		53F9F0FA277AF0DD001A7817 /* Project.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Project.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -128,9 +130,10 @@
 			isa = PBXGroup;
 			children = (
 				53F0B18A277A4D5C002BB3EA /* AppState.swift */,
-				53F0B186277A413B002BB3EA /* Status.swift */,
 				53F0B190277A88B8002BB3EA /* Folder.swift */,
 				53CCD0BF27796836000F3A05 /* Persistence.swift */,
+				53F9F0FA277AF0DD001A7817 /* Project.swift */,
+				53F0B186277A413B002BB3EA /* Status.swift */,
 			);
 			path = State;
 			sourceTree = "<group>";
@@ -219,6 +222,7 @@
 				53CCD0B727796835000F3A05 /* FiddlerApp.swift in Sources */,
 				53F0B18B277A4D5C002BB3EA /* AppState.swift in Sources */,
 				53CCD0CD2779691A000F3A05 /* ProjectDetailView.swift in Sources */,
+				53F9F0FB277AF0DD001A7817 /* Project.swift in Sources */,
 				53F0B18F277A86CC002BB3EA /* NewFolderView.swift in Sources */,
 				53F0B187277A413B002BB3EA /* Status.swift in Sources */,
 			);
