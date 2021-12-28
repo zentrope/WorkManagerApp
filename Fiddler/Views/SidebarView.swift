@@ -26,7 +26,9 @@ struct SidebarView: View {
 
                 Section(header: Text("Active Folders")) {
                     ForEach(appState.folders, id: \.id) { folder in
-                        Label(folder.name, systemImage: "tag")
+                        NavigationLink(destination: ProjectContentView(), tag: folder, selection: $appState.selectedFolder) {
+                            Label(folder.name, systemImage: "tag")
+                        }
                     }
                 }
             }

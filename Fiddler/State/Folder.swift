@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Folder: Identifiable, CustomStringConvertible {
+struct Folder: Identifiable, CustomStringConvertible, Hashable {
     var id: UUID
     var name: String
 

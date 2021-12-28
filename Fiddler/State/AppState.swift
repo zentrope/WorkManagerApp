@@ -11,8 +11,11 @@ import OSLog
 class AppState: NSObject, ObservableObject {
 
     @Published var status = [Status]()
-    @Published var folders = [Folder]()
     @Published var selectedStatus: Int? = 1
+
+    @Published var folders = [Folder]()
+    @Published var selectedFolder: Folder?
+
     @Published var error: Error?
     @Published var hasError = false
 
