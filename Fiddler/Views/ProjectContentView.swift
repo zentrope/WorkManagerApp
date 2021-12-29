@@ -9,18 +9,16 @@ import SwiftUI
 
 struct ProjectContentView: View {
 
+    @EnvironmentObject private var appState: AppState
+
     @State private var showMakeProjectView = false
 
     var body: some View {
         List {
-            NavigationLink(destination: ProjectDetailView()) {
-                ProjectListItem(name: "Learn SwiftUI")
-            }
-            NavigationLink(destination: ProjectDetailView()) {
-                ProjectListItem(name: "Learn CoreData")
-            }
-            NavigationLink(destination: ProjectDetailView()) {
-                ProjectListItem(name: "Learn CloudKit")
+            ForEach(appState.projects, id: \.id) { project in
+                NavigationLink(destination: ProjectDetailView(), tag: project, selection: $appState.selectedProject) {
+                    ProjectListItem(project: project)
+                }
             }
         }
         .listStyle(.inset)
@@ -38,11 +36,5 @@ struct ProjectContentView: View {
         } content: {
             NewProjectView()
         }
-    }
-}
-
-struct ProjectContentViewView_Previews: PreviewProvider {
-    static var previews: some View {
-        ProjectContentView()
     }
 }

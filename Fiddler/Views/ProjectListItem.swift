@@ -8,26 +8,22 @@
 import SwiftUI
 
 struct ProjectListItem: View {
-    var name: String
-    var body: some View {
-        HStack {
-            Text(name)
-            Spacer()
-            Image(systemName: "checkmark.circle")
-                .foregroundColor(.mint)
-            Text("13")
-                .foregroundColor(.mint)
-            Image(systemName: "circle")
-                .foregroundColor(.yellow)
-            Text("10")
-                .foregroundColor(.yellow)
-        }
-        .padding(2)
-    }
-}
 
-struct ProjectListItem_Previews: PreviewProvider {
-    static var previews: some View {
-        ProjectListItem(name: "Start Fiddler Project")
+    var project: Project
+    var body: some View {
+        HStack(alignment: .center, spacing: 6) {
+            Image(systemName: project.isCompleted ? "checkmark.circle" : "circle")
+                .foregroundColor(project.isCompleted ? .green : .orange)
+                .font(Font.headline)
+            Text(project.name)
+                .lineLimit(1)
+            Spacer()
+            Text(project.folder?.name ?? "No folder")
+                .font(.caption)
+                .foregroundColor(.mint)
+                .lineLimit(1)
+
+        }
+        .padding(.vertical, 4)
     }
 }

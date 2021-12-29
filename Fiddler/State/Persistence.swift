@@ -44,4 +44,25 @@ struct PersistenceController {
             try updateContext.save()
         }
     }
+
+    /// Create a project
+    func insert(project: Project) async throws {
+        logger.debug("Upserting \(project)")
+        try await updateContext.perform(schedule: .enqueued) {
+            let projectMO = ProjectMO(context: updateContext)
+            projectMO.id = project.id
+            projectMO.name = project.name
+            projectMO.isCompleted = project.isCompleted
+            projectMO.dateCompleted = project.dateCompleted
+
+            if let folder = project.folder {
+                let folderMO = FolderMO(context: updateContext)
+                folderMO.id = folder.id
+                folderMO.name = folder.name
+                projectMO.folder = folderMO
+            }
+
+            try updateContext.save()
+        }
+    }
 }

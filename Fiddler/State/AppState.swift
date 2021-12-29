@@ -17,6 +17,9 @@ final class AppState: NSObject, ObservableObject {
     @Published var folders = [Folder]()
     @Published var selectedFolder: Folder?
 
+    @Published var projects = [Project]()
+    @Published var selectedProject: Project?
+
     @Published var error: Error?
     @Published var hasError = false
 
@@ -29,6 +32,24 @@ final class AppState: NSObject, ObservableObject {
         let fetcher = FolderMO.fetchRequest()
         fetcher.sortDescriptors = [ NSSortDescriptor(key: "name", ascending: true)]
         let cursor = NSFetchedResultsController(fetchRequest: fetcher, managedObjectContext: PersistenceController.shared.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        cursor.delegate = self
+        return cursor
+    }()
+
+    private lazy var projectCursor: NSFetchedResultsController<ProjectMO> = {
+
+        let fetcher = ProjectMO.fetchRequest()
+
+        fetcher.sortDescriptors = [
+            NSSortDescriptor(key: "name", ascending: true)
+        ]
+
+        let cursor = NSFetchedResultsController(
+            fetchRequest: fetcher,
+            managedObjectContext: PersistenceController.shared.container.viewContext,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
         cursor.delegate = self
         return cursor
     }()
@@ -47,7 +68,12 @@ final class AppState: NSObject, ObservableObject {
     }
 
     func save(project: Project) async {
-        logger.debug("Save → \(project)")
+        do {
+            try await PersistenceController.shared.insert(project: project)
+        } catch (let error) {
+            logger.error("\(error.localizedDescription)")
+            await set(error: error)
+        }
     }
 
     @MainActor
@@ -58,6 +84,9 @@ final class AppState: NSObject, ObservableObject {
 
     private func reload() {
         do {
+            try projectCursor.performFetch()
+            projects = (projectCursor.fetchedObjects ?? []).map { .init(mo: $0 ) }
+
             try folderCursor.performFetch()
             folders = (folderCursor.fetchedObjects ?? []).map { .init(mo: $0) }
         } catch (let error) {
