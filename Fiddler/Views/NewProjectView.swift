@@ -70,7 +70,7 @@ struct NewProjectView: View {
         .padding()
         .fixedSize()
         .onAppear {
-            folder = appState.folders.first!
+            folder = appState.selectedFolder ?? appState.folders.first!
         }
     }
 
