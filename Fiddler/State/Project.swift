@@ -15,20 +15,18 @@ struct Project: Identifiable, CustomStringConvertible {
     var dateCreated: Date
     var dateCompleted: Date?
     var folder: Folder?
-    var status: Status?
 
     var description: String {
-        return #"Project(id: \#(id), name: "\#(name)", isCompleted: \#(isCompleted), dateCreated: \#(dateCreated), dateCompleted: \#(String(describing: dateCompleted)), folder: \#(String(describing: folder)), status: \#(String(describing: status)))"#
+        return #"Project(id: \#(id), name: "\#(name)", isCompleted: \#(isCompleted), dateCreated: \#(dateCreated), dateCompleted: \#(String(describing: dateCompleted)), folder: \#(String(describing: folder)))"#
     }
 
-    init(name: String, folder: Folder, status: Status?) {
+    init(name: String, folder: Folder) {
         self.id = UUID()
         self.name = name
         self.isCompleted = false
         self.dateCreated = Date()
         self.dateCompleted = nil
         self.folder = folder
-        self.status = status
     }
 
     init(mo: ProjectMO) {
@@ -40,10 +38,6 @@ struct Project: Identifiable, CustomStringConvertible {
 
         if let folder = mo.folder {
             self.folder = Folder(mo: folder)
-        }
-
-        if let status = mo.status {
-            self.status = Status(mo: status)
         }
     }
 }

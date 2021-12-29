@@ -21,9 +21,3 @@ struct ContentView: View {
         .navigationTitle("Tiny Project Manager")
     }
 }
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
-}

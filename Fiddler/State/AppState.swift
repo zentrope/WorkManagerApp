@@ -12,8 +12,7 @@ fileprivate let logger = Logger("AppState")
 
 final class AppState: NSObject, ObservableObject {
 
-    @Published var status = [Status]()
-    @Published var selectedStatus: Int? = 1
+    @Published var selectedStatus: Status? = Status.open
 
     @Published var folders = [Folder]()
     @Published var selectedFolder: Folder?
@@ -21,15 +20,10 @@ final class AppState: NSObject, ObservableObject {
     @Published var error: Error?
     @Published var hasError = false
 
-
-
-    private lazy var statusCursor: NSFetchedResultsController<StatusMO> = {
-        let fetcher = StatusMO.fetchRequest()
-        fetcher.sortDescriptors = [ NSSortDescriptor(key: "id", ascending: true)]
-        let cursor = NSFetchedResultsController(fetchRequest: fetcher, managedObjectContext: PersistenceController.shared.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
-        cursor.delegate = self
-        return cursor
-    }()
+    enum Status: String, CaseIterable {
+        case open = "Open"
+        case completed = "Completed"
+    }
 
     private lazy var folderCursor: NSFetchedResultsController<FolderMO> = {
         let fetcher = FolderMO.fetchRequest()
@@ -64,12 +58,8 @@ final class AppState: NSObject, ObservableObject {
 
     private func reload() {
         do {
-            try statusCursor.performFetch()
-            status = (statusCursor.fetchedObjects ?? []).map { .init(mo: $0) }
-
             try folderCursor.performFetch()
             folders = (folderCursor.fetchedObjects ?? []).map { .init(mo: $0) }
-
         } catch (let error) {
             logger.error("\(error.localizedDescription)")
         }

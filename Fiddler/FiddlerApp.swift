@@ -11,11 +11,6 @@ import SwiftUI
 struct FiddlerApp: App {
 
     private let appState = AppState()
-    init() {
-        Task {
-            await PersistenceController.shared.setup()
-        }
-    }
 
     var body: some Scene {
         WindowGroup {

@@ -17,9 +17,9 @@ struct SidebarView: View {
         VStack(alignment: .leading) {
             List {
                 Section(header: Text("Status")) {
-                    ForEach(appState.status, id: \.id) { status in
-                        NavigationLink(destination: ProjectContentView(), tag: status.id, selection: $appState.selectedStatus) {
-                            Label(status.name, systemImage: "folder")
+                    ForEach(AppState.Status.allCases, id: \.self) { status in
+                        NavigationLink(destination: ProjectContentView(), tag: status, selection: $appState.selectedStatus) {
+                            Label(status.rawValue, systemImage: "folder")
                         }
                     }
                 }
@@ -52,11 +52,5 @@ struct SidebarView: View {
         } content: {
             NewFolderView()
         }
-    }
-}
-
-struct SidebarView_Previews: PreviewProvider {
-    static var previews: some View {
-        SidebarView()
     }
 }

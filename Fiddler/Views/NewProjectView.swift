@@ -76,7 +76,7 @@ struct NewProjectView: View {
 
     private func saveProject() {
         Task {
-            let project = Project(name: name, folder: folder, status: appState.status.first)
+            let project = Project(name: name, folder: folder)
             await appState.save(project: project)
         }
     }
