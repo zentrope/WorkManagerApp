@@ -21,7 +21,7 @@ struct PersistenceController {
     private var updateContext: NSManagedObjectContext
 
     init() {
-        let container = NSPersistentCloudKitContainer(name: "Fiddler")
+        let container = NSPersistentCloudKitContainer(name: "ProjectManager")
         container.loadPersistentStores { storeDescription, error in
             container.viewContext.automaticallyMergesChangesFromParent = true
 

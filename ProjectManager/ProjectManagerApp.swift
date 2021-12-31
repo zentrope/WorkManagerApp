@@ -1,6 +1,6 @@
 //
-//  FiddlerApp.swift
-//  Fiddler
+//  ProjectManagerApp.swift
+//  ProjectManager
 //
 //  Created by Keith Irwin on 12/26/21.
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct FiddlerApp: App {
+struct ProjectManagerApp: App {
 
     private let appState = AppState()
 
@@ -18,9 +18,8 @@ struct FiddlerApp: App {
                 .environmentObject(appState)
                 .frame(minWidth: 1024, minHeight: 600)
         }
-
-        //.windowStyle(TitleBarWindowStyle())
-        //.windowToolbarStyle(UnifiedWindowToolbarStyle(showsTitle: false))
+        .windowStyle(.automatic)
+        .windowToolbarStyle(.unified(showsTitle: false))
         .commands {
             SidebarCommands()
         }

@@ -11,6 +11,9 @@ import SwiftUI
 
 // @TODO: Look at ScratchPad app for NSTextView editor help.
 
+// https://www.swiftdevjournal.com/disable-a-text-field-in-a-swiftui-list-until-tapping-edit-button/
+
+
 struct ProjectDetailView: View {
 
     @StateObject private var viewState: ProjectDetailViewState
@@ -54,23 +57,23 @@ struct ProjectDetailView: View {
                 }
                 .padding(.horizontal, 3)
 
-                Divider()
+                //Divider()
             }
+            .padding([.horizontal, .top], 20)
 
             ScrollView {
                 ForEach(viewState.project.tasks, id: \.id) { task in
                     TaskItemView(task: task)
                         .lineLimit(1)
                         .padding(.vertical, 2)
-                        .padding(.leading, 3)
+                        .padding(.leading, 20)
                 }
             }
-            Spacer()
+            .padding(.bottom, 10)
+            //Spacer()
         }
-        .padding()
-        .frame(minWidth: 400, maxWidth: .infinity, minHeight: 500)
+        .frame(minWidth: 400, maxWidth: .infinity, minHeight: 400)
         .background(Color(nsColor: .controlBackgroundColor))
-        .navigationTitle(viewState.project.name)
 
         // MARK: - Toolbar
         .toolbar {
@@ -90,6 +93,8 @@ struct ProjectDetailView: View {
         } content: {
             NewTaskView(project: viewState.project)
         }
+        .navigationTitle(viewState.project.name)
+        .navigationSubtitle(viewState.project.folder.name)
     }
 }
 

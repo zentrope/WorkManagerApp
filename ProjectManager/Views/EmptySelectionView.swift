@@ -20,10 +20,10 @@ struct EmptySelectionView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .foregroundColor(Color(nsColor: .tertiaryLabelColor))
         .background(Color(nsColor: .textBackgroundColor))
-        .toolbar {
-            // When no project is selected, show an empty toolbar so that the content column's toolbar items don't slide all the way to the trailing edge of the application window.
-            ToolbarItem { Spacer() }
-        }
+//        .toolbar {
+//            // When no project is selected, show an empty toolbar so that the content column's toolbar items don't slide all the way to the trailing edge of the application window.
+//            ToolbarItemGroup { Spacer() }
+//        }
     }
 }
 
