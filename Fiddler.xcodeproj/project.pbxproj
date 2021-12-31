@@ -8,6 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		53023BED277C24AA006E4845 /* Fiddler.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 53023BEB277C24AA006E4845 /* Fiddler.xcdatamodeld */; };
+		537A03CB277E3B4D0094A733 /* ProjectTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537A03CA277E3B4D0094A733 /* ProjectTask.swift */; };
+		539F9E2E277ECD3600AC02B0 /* NewTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539F9E2D277ECD3600AC02B0 /* NewTaskView.swift */; };
+		539F9E30277ED58D00AC02B0 /* TaskItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539F9E2F277ED58D00AC02B0 /* TaskItemView.swift */; };
+		539F9E32277ED72D00AC02B0 /* DateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539F9E31277ED72D00AC02B0 /* DateView.swift */; };
+		539F9E35277EE98E00AC02B0 /* ProjectDetailViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539F9E34277EE98E00AC02B0 /* ProjectDetailViewState.swift */; };
 		53CCD0B727796835000F3A05 /* FiddlerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53CCD0B627796835000F3A05 /* FiddlerApp.swift */; };
 		53CCD0B927796835000F3A05 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53CCD0B827796835000F3A05 /* ContentView.swift */; };
 		53CCD0BB27796836000F3A05 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53CCD0BA27796836000F3A05 /* Assets.xcassets */; };
@@ -29,6 +34,11 @@
 
 /* Begin PBXFileReference section */
 		53023BEC277C24AA006E4845 /* Fiddler.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Fiddler.xcdatamodel; sourceTree = "<group>"; };
+		537A03CA277E3B4D0094A733 /* ProjectTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectTask.swift; sourceTree = "<group>"; };
+		539F9E2D277ECD3600AC02B0 /* NewTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTaskView.swift; sourceTree = "<group>"; };
+		539F9E2F277ED58D00AC02B0 /* TaskItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskItemView.swift; sourceTree = "<group>"; };
+		539F9E31277ED72D00AC02B0 /* DateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateView.swift; sourceTree = "<group>"; };
+		539F9E34277EE98E00AC02B0 /* ProjectDetailViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectDetailViewState.swift; sourceTree = "<group>"; };
 		53CCD0B327796835000F3A05 /* Fiddler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Fiddler.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		53CCD0B627796835000F3A05 /* FiddlerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiddlerApp.swift; sourceTree = "<group>"; };
 		53CCD0B827796835000F3A05 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -80,9 +90,9 @@
 		53CCD0B527796835000F3A05 /* Fiddler */ = {
 			isa = PBXGroup;
 			children = (
+				53CCD0C427796836000F3A05 /* Fiddler.entitlements */,
 				53CCD0B627796835000F3A05 /* FiddlerApp.swift */,
 				53CCD0BA27796836000F3A05 /* Assets.xcassets */,
-				53CCD0C427796836000F3A05 /* Fiddler.entitlements */,
 				53CCD0BC27796836000F3A05 /* Preview Content */,
 				53F0B189277A4D40002BB3EA /* State */,
 				53F0B185277A4126002BB3EA /* System */,
@@ -103,14 +113,18 @@
 			isa = PBXGroup;
 			children = (
 				53CCD0B827796835000F3A05 /* ContentView.swift */,
+				539F9E31277ED72D00AC02B0 /* DateView.swift */,
 				53CCD0D427796FD3000F3A05 /* EmptySelectionView.swift */,
+				53F0B18E277A86CC002BB3EA /* NewFolderView.swift */,
 				53CCD0DA27797E5F000F3A05 /* NewProjectView.swift */,
+				539F9E2D277ECD3600AC02B0 /* NewTaskView.swift */,
 				53CCD0D127796C81000F3A05 /* ProjectContentView.swift */,
 				53CCD0CC2779691A000F3A05 /* ProjectDetailView.swift */,
+				539F9E34277EE98E00AC02B0 /* ProjectDetailViewState.swift */,
 				53CCD0CA277968C4000F3A05 /* ProjectListItem.swift */,
 				53CCD0D827797DBE000F3A05 /* SettingsView.swift */,
 				53CCD0D627797CB8000F3A05 /* SidebarView.swift */,
-				53F0B18E277A86CC002BB3EA /* NewFolderView.swift */,
+				539F9E2F277ED58D00AC02B0 /* TaskItemView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -130,6 +144,7 @@
 				53F0B190277A88B8002BB3EA /* Folder.swift */,
 				53CCD0BF27796836000F3A05 /* Persistence.swift */,
 				53F9F0FA277AF0DD001A7817 /* Project.swift */,
+				537A03CA277E3B4D0094A733 /* ProjectTask.swift */,
 				53023BEB277C24AA006E4845 /* Fiddler.xcdatamodeld */,
 			);
 			path = State;
@@ -207,6 +222,7 @@
 			files = (
 				53CCD0C027796836000F3A05 /* Persistence.swift in Sources */,
 				53CCD0B927796835000F3A05 /* ContentView.swift in Sources */,
+				539F9E2E277ECD3600AC02B0 /* NewTaskView.swift in Sources */,
 				53CCD0D227796C81000F3A05 /* ProjectContentView.swift in Sources */,
 				53F0B191277A88B8002BB3EA /* Folder.swift in Sources */,
 				53F0B18D277A4D98002BB3EA /* Logger+Ext.swift in Sources */,
@@ -214,12 +230,16 @@
 				53CCD0DB27797E5F000F3A05 /* NewProjectView.swift in Sources */,
 				53CCD0CB277968C4000F3A05 /* ProjectListItem.swift in Sources */,
 				53CCD0D927797DBE000F3A05 /* SettingsView.swift in Sources */,
+				539F9E32277ED72D00AC02B0 /* DateView.swift in Sources */,
 				53CCD0D727797CB8000F3A05 /* SidebarView.swift in Sources */,
+				539F9E35277EE98E00AC02B0 /* ProjectDetailViewState.swift in Sources */,
 				53023BED277C24AA006E4845 /* Fiddler.xcdatamodeld in Sources */,
 				53CCD0B727796835000F3A05 /* FiddlerApp.swift in Sources */,
 				53F0B18B277A4D5C002BB3EA /* AppState.swift in Sources */,
 				53CCD0CD2779691A000F3A05 /* ProjectDetailView.swift in Sources */,
 				53F9F0FB277AF0DD001A7817 /* Project.swift in Sources */,
+				539F9E30277ED58D00AC02B0 /* TaskItemView.swift in Sources */,
+				537A03CB277E3B4D0094A733 /* ProjectTask.swift in Sources */,
 				53F0B18F277A86CC002BB3EA /* NewFolderView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

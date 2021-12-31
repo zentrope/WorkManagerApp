@@ -13,13 +13,14 @@ fileprivate let logger = Logger("AppState")
 
 final class AppState: NSObject, ObservableObject {
 
+    // MARK: - Publishers
+
     @Published var selectedStatus: Status? = Status.open
 
     @Published var folders = [Folder]()
     @Published var selectedFolder: Folder?
 
     @Published var projects = [Project]()
-    @Published var selectedProject: Project?
 
     @Published var error: Error?
     @Published var hasError = false
@@ -28,6 +29,8 @@ final class AppState: NSObject, ObservableObject {
         case open = "Open"
         case completed = "Completed"
     }
+
+    // MARK: - Local State
 
     private lazy var folderCursor: NSFetchedResultsController<FolderMO> = {
         let fetcher = FolderMO.fetchRequest()
@@ -56,6 +59,8 @@ final class AppState: NSObject, ObservableObject {
 
     private var subscribers = Set<AnyCancellable>()
 
+    // MARK: - Initializers
+
     override init() {
         super.init()
 
@@ -70,11 +75,13 @@ final class AppState: NSObject, ObservableObject {
         reload()
     }
 
+    // MARK: - Mutators
+
     func save(folder: Folder) async {
         do {
             try await PersistenceController.shared.insert(folder: folder)
         } catch (let error) {
-            await set(error: error)
+            set(error: error)
         }
     }
 
@@ -83,11 +90,21 @@ final class AppState: NSObject, ObservableObject {
             try await PersistenceController.shared.insert(project: project)
         } catch (let error) {
             logger.error("\(error.localizedDescription)")
-            await set(error: error)
+            set(error: error)
         }
     }
 
-    @MainActor
+    func save(task: ProjectTask, in project: Project) async {
+        do {
+            try await PersistenceController.shared.add(task: task, to: project)
+        } catch (let error) {
+            logger.error("\(error.localizedDescription)")
+            set(error: error)
+        }
+    }
+
+    // MARK: - Implementation Details
+
     private func set(error: Error) {
         self.hasError = true
         self.error = error
@@ -120,6 +137,8 @@ final class AppState: NSObject, ObservableObject {
         }
     }
 }
+
+// MARK: - Delegates
 
 extension AppState: NSFetchedResultsControllerDelegate {
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {

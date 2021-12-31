@@ -16,25 +16,22 @@ struct ProjectContentView: View {
     var body: some View {
         List {
             ForEach(appState.projects, id: \.id) { project in
-                NavigationLink(destination: ProjectDetailView(), tag: project, selection: $appState.selectedProject) {
+                NavigationLink(destination: ProjectDetailView(project)) {
                     ProjectListItem(project: project)
                 }
             }
         }
         .listStyle(.inset)
         .frame(minWidth: 300, idealWidth: 300)
-        .navigationTitle("Projects")
         .toolbar {
+            ToolbarItem(placement: .primaryAction) {
             Button {
                 showMakeProjectView.toggle()
             } label: {
                 Image(systemName: "folder.badge.plus")
             }
+            }
         }
-        .sheet(isPresented: $showMakeProjectView) {
-            print("Dismissed")
-        } content: {
-            NewProjectView()
-        }
+        .sheet(isPresented: $showMakeProjectView, onDismiss: {}, content: { NewProjectView() })
     }
 }

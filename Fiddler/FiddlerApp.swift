@@ -19,8 +19,8 @@ struct FiddlerApp: App {
                 .frame(minWidth: 1024, minHeight: 600)
         }
 
-        .windowStyle(TitleBarWindowStyle())
-        .windowToolbarStyle(UnifiedWindowToolbarStyle(showsTitle: true))
+        //.windowStyle(TitleBarWindowStyle())
+        //.windowToolbarStyle(UnifiedWindowToolbarStyle(showsTitle: false))
         .commands {
             SidebarCommands()
         }

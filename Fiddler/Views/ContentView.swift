@@ -10,14 +10,21 @@ import CoreData
 
 struct ContentView: View {
 
+    @EnvironmentObject private var appState: AppState
+    
     @State private var showMakeProjectView = false
 
     var body: some View {
         NavigationView {
             SidebarView()
             EmptySelectionView(systemName: "folder", message: "No folder selected")
-            ProjectDetailView()
+            EmptySelectionView(systemName: "folder", message: "No project selected")
         }
-        .navigationTitle("Tiny Project Manager")
+        .navigationSubtitle(title)
+    }
+
+    private var title: String {
+        let folder = appState.selectedFolder?.name ?? (appState.selectedStatus?.rawValue ?? "")
+        return "\(folder) Projects".trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

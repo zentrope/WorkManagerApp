@@ -18,6 +18,7 @@
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="notes" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformerName" customClassName="NSAttributedString"/>
         <relationship name="folder" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FolderMO" inverseName="projects" inverseEntity="FolderMO"/>
+        <relationship name="tasks" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TaskMO" inverseName="project" inverseEntity="TaskMO"/>
         <uniquenessConstraints>
             <uniquenessConstraint>
                 <constraint value="id"/>
@@ -25,8 +26,21 @@
             </uniquenessConstraint>
         </uniquenessConstraints>
     </entity>
+    <entity name="TaskMO" representedClassName="TaskMO" syncable="YES" codeGenerationType="class">
+        <attribute name="dateCompleted" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isCompleted" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ProjectMO" inverseName="tasks" inverseEntity="ProjectMO"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="id"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
     <elements>
         <element name="FolderMO" positionX="-63" positionY="-18" width="128" height="74"/>
-        <element name="ProjectMO" positionX="-54" positionY="9" width="128" height="119"/>
+        <element name="ProjectMO" positionX="-54" positionY="9" width="128" height="134"/>
+        <element name="TaskMO" positionX="-63" positionY="45" width="128" height="104"/>
     </elements>
 </model>

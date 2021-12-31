@@ -13,18 +13,20 @@ struct Project: Identifiable, Hashable, CustomStringConvertible {
     var name: String
     var isCompleted: Bool
     var dateCompleted: Date?
-    var folder: Folder?
+    var folder: Folder
+    var tasks: [ProjectTask]
 
     var description: String {
         return #"Project(id: \#(id), name: "\#(name)", isCompleted: \#(isCompleted), dateCompleted: \#(String(describing: dateCompleted)), folder: \#(String(describing: folder)))"#
     }
 
-    init(name: String, folder: Folder) {
+    init(name: String, folder: Folder, tasks: [ProjectTask] = []) {
         self.id = UUID()
         self.name = name
         self.isCompleted = false
         self.dateCompleted = nil
         self.folder = folder
+        self.tasks = tasks
     }
 
     init(mo: ProjectMO) {
@@ -35,6 +37,21 @@ struct Project: Identifiable, Hashable, CustomStringConvertible {
 
         if let folder = mo.folder {
             self.folder = Folder(mo: folder)
+        } else {
+            self.folder = Folder.noFolder
         }
+
+        self.tasks = mo.wrappedTasks.map { .init(mo: $0) }
+    }
+}
+
+extension ProjectMO {
+
+    var wrappedTasks: [TaskMO] {
+        let array = tasks?.sortedArray(using: [NSSortDescriptor(key: "id", ascending: true)]) as? [TaskMO]
+        if let values = array {
+            return values
+        }
+        return []
     }
 }

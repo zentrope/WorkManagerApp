@@ -29,4 +29,6 @@ struct Folder: Identifiable, CustomStringConvertible, Hashable {
         self.id = mo.id ?? UUID()
         self.name = mo.name ?? "Folder \(self.id)"
     }
+
+    static let noFolder = Folder(name: "Null")
 }
