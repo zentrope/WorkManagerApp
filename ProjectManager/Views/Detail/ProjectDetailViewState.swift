@@ -6,10 +6,15 @@
 //
 
 import Foundation
+import OSLog
+
+fileprivate let log = Logger("ProjectDetailViewState")
 
 class ProjectDetailViewState: NSObject, ObservableObject {
 
     @Published var project: Project
+    @Published var error: Error?
+    @Published var hasError = false
 
     init(preview project: Project) {
         self.project = project
@@ -26,13 +31,22 @@ class ProjectDetailViewState: NSObject, ObservableObject {
 
     private func reload() {
         Task {
-            let mo = try await PersistenceController.shared.find(project: project.id)
-            await set(project: Project(mo: mo))
+            do {
+                let mo = try await PersistenceController.shared.find(project: project.id)
+                await set(project: Project(mo: mo))
+            } catch (let error) {
+                set(error: error)
+            }
         }
     }
 
     @MainActor
     private func set(project: Project) {
         self.project = project
+    }
+
+    private func set(error: Error) {
+        self.error = error
+        self.hasError = true
     }
 }

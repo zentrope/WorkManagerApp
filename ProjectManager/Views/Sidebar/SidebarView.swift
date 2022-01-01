@@ -23,14 +23,6 @@ struct SidebarView: View {
                             Label(folder.name, systemImage: "folder")
                                 .badge(folder.projects.count)
                         }
-                        .contextMenu {
-                            Button {
-                                print(#"Rename "\#(folder.name)" not implemented."#)
-                            } label: {
-                                Text("Rename…")
-                            }
-
-                        }
                     }
                 }
             }

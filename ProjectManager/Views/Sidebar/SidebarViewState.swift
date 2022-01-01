@@ -28,6 +28,10 @@ final class SidebarViewState: NSObject, ObservableObject {
     override init() {
         super.init()
         reload()
+
+        NotificationCenter.default.addObserver(forName: .NSManagedObjectContextDidSave, object: nil, queue: .main) { [weak self] msg in
+            self?.reload()
+        }
     }
 
     private func reload() {

@@ -12,11 +12,12 @@ fileprivate let logger = Logger("NewProjectView")
 
 struct NewProjectView: View {
 
-    @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var appState: AppState
+    @Binding var name: String
+    @Binding var doSave: Bool
 
-    @State private var name = ""
-    @State private var folder = Folder(name: "None") // Updated in .onAppear
+    var folderName: String
+
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -41,25 +42,21 @@ struct NewProjectView: View {
                 HStack(alignment: .center, spacing: 10) {
                     Text("Folder:")
                         .frame(width: 64, alignment: .trailing)
-                    Picker("Folder", selection: $folder) {
-                        ForEach(appState.folders, id: \.self) { folder in
-                            Text(folder.name).tag(folder)
-                        }
-                    }
-                    .labelsHidden()
-                    .fixedSize()
-                    .frame(width: 300, alignment: .leading)
+                    Text(folderName)
+                        .frame(width: 300, alignment: .leading)
+                        .foregroundColor(.secondary)
                 }
             }
 
             HStack(alignment: .center, spacing: 20) {
                 Spacer()
                 Button("Cancel") {
+                    doSave = false
                     dismiss()
                 }
                 .keyboardShortcut(.cancelAction)
                 Button("Save") {
-                    saveProject()
+                    doSave = true
                     dismiss()
                 }
                 // On MacOS 12 Monterey, the Save button is highlighted, but the return key doesn't activate. The .cancelAction mechanism works as expected (hitting escape cancels).
@@ -69,15 +66,5 @@ struct NewProjectView: View {
         }
         .padding()
         .fixedSize()
-        .onAppear {
-            folder = appState.selectedFolder ?? appState.folders.first!
-        }
-    }
-
-    private func saveProject() {
-        Task {
-            let project = Project(name: name, folder: folder)
-            await appState.save(project: project)
-        }
     }
 }
