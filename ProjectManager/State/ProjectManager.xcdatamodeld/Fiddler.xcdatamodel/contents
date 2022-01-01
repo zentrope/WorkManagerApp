@@ -3,7 +3,7 @@
     <entity name="FolderMO" representedClassName="FolderMO" syncable="YES" codeGenerationType="class">
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="name" optional="YES" attributeType="String"/>
-        <relationship name="projects" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ProjectMO" inverseName="folder" inverseEntity="ProjectMO"/>
+        <relationship name="projects" optional="YES" toMany="YES" deletionRule="Deny" destinationEntity="ProjectMO" inverseName="folder" inverseEntity="ProjectMO"/>
         <uniquenessConstraints>
             <uniquenessConstraint>
                 <constraint value="id"/>
@@ -18,7 +18,7 @@
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="notes" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromDataTransformerName" customClassName="NSAttributedString"/>
         <relationship name="folder" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FolderMO" inverseName="projects" inverseEntity="FolderMO"/>
-        <relationship name="tasks" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TaskMO" inverseName="project" inverseEntity="TaskMO"/>
+        <relationship name="tasks" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="TaskMO" inverseName="project" inverseEntity="TaskMO"/>
         <uniquenessConstraints>
             <uniquenessConstraint>
                 <constraint value="id"/>

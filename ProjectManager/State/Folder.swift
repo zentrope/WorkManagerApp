@@ -13,31 +13,28 @@ fileprivate let log = Logger("Folder")
 struct Folder: Identifiable, CustomStringConvertible, Hashable {
     var id: UUID
     var name: String
-
-    var projects: [Project] {
-        return mo?.wrappedProjects.map { .init(mo: $0) } ?? []
-    }
+    var projects: [Project]
 
     var description: String {
-        #"Folder(id: \#(id), name: "\#(name)")"#
+        #"Folder(id: \#(id), name: "\#(name)", projects: \#(projects.count))"#
     }
-
-    private var mo: FolderMO?
 
     init(name: String) {
         self.id = UUID()
         self.name = name
+        self.projects = []
     }
 
     init(id: UUID, name: String) {
         self.id = id
         self.name = name
+        self.projects = []
     }
 
     init(folderMO: FolderMO) {
         self.id = folderMO.id ?? UUID()
         self.name = folderMO.name ?? "Folder \(self.id)"
-        self.mo = folderMO
+        self.projects = folderMO.wrappedProjects.map { Project(mo: $0)}
     }
 
     static let noFolder = Folder(name: "Null")

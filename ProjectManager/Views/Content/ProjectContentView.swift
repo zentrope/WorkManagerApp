@@ -13,6 +13,9 @@ struct ProjectContentView: View {
 
     @StateObject private var state = ProjectContentViewState()
 
+    // Confirm delete
+    @State private var projectToDelete: Project?
+
     // New Project State
     @State private var showMakeProjectView = false
     @State private var newProjectName = "New Project"
@@ -25,9 +28,26 @@ struct ProjectContentView: View {
                     NavigationLink(destination: ProjectDetailView(project), tag: project.name, selection: $state.selectedProject) {
                         ProjectListItem(project: project)
                     }
+                    .contextMenu {
+                        Button("Delete") {
+                            projectToDelete = project
+                        }
+                    }
                 }
             }
             .listStyle(.inset)
+            .alert(item: $projectToDelete) { project in
+                Alert(
+                    title: Text(#"Delete "\#(project.name)" and all its tasks?"#),
+                    message: Text("This cannot be undone"),
+                    primaryButton: .destructive(Text("Delete")) {
+                        Task {
+                            await state.delete(project: project)
+                        }
+                    },
+                    secondaryButton: .cancel()
+                )
+            }
         }
         .frame(minWidth: 300, idealWidth: 300)
         .sheet(isPresented: $showMakeProjectView) {
@@ -42,8 +62,8 @@ struct ProjectContentView: View {
         } content: {
             NewProjectView(name: $newProjectName, doSave: $saveNewProject, folderName: folder.name)
         }
-        .alert(state.error?.localizedDescription ?? "Error", isPresented: $state.hasError) {
-            Button("Ok", role: .cancel) { }
+        .alert("ContentView: \(state.error?.localizedDescription ?? "Error")", isPresented: $state.hasError) {
+
         }
         .toolbar {
             ToolbarItem {

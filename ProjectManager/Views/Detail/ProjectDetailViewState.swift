@@ -35,7 +35,7 @@ class ProjectDetailViewState: NSObject, ObservableObject {
                 let mo = try await PersistenceController.shared.find(project: project.id)
                 await set(project: Project(mo: mo))
             } catch (let error) {
-                set(error: error)
+                await set(error: error)
             }
         }
     }
@@ -45,6 +45,7 @@ class ProjectDetailViewState: NSObject, ObservableObject {
         self.project = project
     }
 
+    @MainActor
     private func set(error: Error) {
         self.error = error
         self.hasError = true

@@ -23,9 +23,7 @@ class ProjectContentViewState: NSObject, ObservableObject {
     func saveProject(name: String, folder: Folder) async {
         do {
             let project = Project(name: name, folder: folder)
-            log.debug("Saving \(project)")
             try await PersistenceController.shared.insert(project: project)
-            log.debug("Saved without exception")
             await set(selected: name)
         } catch (let error) {
             log.error("\(error.localizedDescription)")
@@ -33,8 +31,20 @@ class ProjectContentViewState: NSObject, ObservableObject {
         }
     }
 
+    func delete(project: Project) async {
+        do {
+            if project.name == selectedProject {
+                await set(selected: nil)
+            }
+            try await PersistenceController.shared.delete(project: project)
+        } catch (let error) {
+            log.debug("\(error.localizedDescription)")
+            set(error: error)
+        }
+    }
+
     @MainActor
-    private func set(selected: String) {
+    private func set(selected: String?) {
         self.selectedProject = selected
     }
 

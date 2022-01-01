@@ -64,6 +64,14 @@ struct PersistenceController {
         }
     }
 
+    func delete(project: Project) async throws {
+        let projectMO = try await find(project: project.id, context: updateContext)
+        try await updateContext.perform(schedule: .enqueued) {
+            updateContext.delete(projectMO)
+            try updateContext.save()
+        }
+    }
+
     /// Create a project task
     func add(task: ProjectTask, to project: Project) async throws {
         logger.debug("Upserting \(task)")
@@ -82,12 +90,26 @@ struct PersistenceController {
 
     // MARK: - Queries
 
+    enum DataError: Error, LocalizedError {
+        case ProjectNotFound
+        case FolderNotFound
+
+        var errorDescription: String? {
+            switch self {
+                case .ProjectNotFound: return "Project not found."
+                case .FolderNotFound: return "Folder not found."
+            }
+        }
+    }
+
     private func find(folder id: UUID, context: NSManagedObjectContext) async throws -> FolderMO {
         try await context.perform {
             let request = FolderMO.fetchRequest()
             request.predicate = NSPredicate(format: "id = %@", id as CVarArg)
-            let folder = try context.fetch(request).first!
-            return folder
+            if let folder = try context.fetch(request).first {
+                return folder
+            }
+            throw DataError.FolderNotFound
         }
     }
 
@@ -95,8 +117,10 @@ struct PersistenceController {
         try await context.perform {
             let request = ProjectMO.fetchRequest()
             request.predicate = NSPredicate(format: "id = %@", id as CVarArg)
-            let project = try context.fetch(request).first!
-            return project
+            if let project = try context.fetch(request).first {
+                return project
+            }
+            throw DataError.ProjectNotFound
         }
     }
 

@@ -92,7 +92,7 @@ struct ProjectDetailView: View {
         .navigationTitle(viewState.project.name)
         .navigationSubtitle(viewState.project.folder.name)
 
-        .alert(viewState.error?.localizedDescription ?? "Error", isPresented: $viewState.hasError) {
+        .alert("ProjectDetailView: \(viewState.error?.localizedDescription ?? "Error")", isPresented: $viewState.hasError) {
             Button("Ok", role: .cancel) { }
         }
     }
@@ -122,8 +122,7 @@ struct ProjectDetailView_Previews: PreviewProvider {
         let project = Project(
             name: "Test this view in a preview window",
             folder: folder, tasks: tasks
-        )
-        //let viewState = ProjectDetailViewState(preview: testProject)
+        )        
         ProjectDetailView(preview: project)
     }
 }
