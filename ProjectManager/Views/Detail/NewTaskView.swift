@@ -38,6 +38,9 @@ struct NewTaskView: View {
                     TextField("Description", text: $name)
                         .textFieldStyle(.squareBorder)
                         .frame(width: width, alignment: .leading)
+                        .onSubmit { // hack due to .defaultAction not working on MacOS 12.1
+                            saveTask()
+                        }
                 }
 
                 HStack(alignment: .center, spacing: 10) {
@@ -64,11 +67,7 @@ struct NewTaskView: View {
                 }
                 .keyboardShortcut(.cancelAction)
                 Button("Save") {
-                    let task = ProjectTask(name: name)
-                    Task {
-                        await appState.save(task: task, in: project)
-                    }
-                    dismiss()
+                    saveTask()
                 }
                 .keyboardShortcut(.defaultAction)
                 .disabled(name.isEmpty)
@@ -76,6 +75,15 @@ struct NewTaskView: View {
         }
         .padding()
         .fixedSize()
+    }
+
+    private func saveTask() {
+        // TODO: Move new task to ProjectDetailViewState.
+        let task = ProjectTask(name: name)
+        Task {
+            await appState.save(task: task, in: project)
+        }
+        dismiss()
     }
 }
 

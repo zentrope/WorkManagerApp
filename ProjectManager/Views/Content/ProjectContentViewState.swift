@@ -31,15 +31,20 @@ class ProjectContentViewState: NSObject, ObservableObject {
         }
     }
 
-    func delete(project: Project) async {
-        do {
-            if project.name == selectedProject {
-                await set(selected: nil)
+    func delete(project: Project) {
+        if project.name == selectedProject {
+            log.debug("Setting selectProject to nil")
+            selectedProject = nil
+        }
+        Task {
+            do {
+                log.debug("Deleting project")
+                try await PersistenceController.shared.delete(project: project)
+                log.debug("Project deleted")
+            } catch (let error) {
+                log.debug("\(error.localizedDescription)")
+                set(error: error)
             }
-            try await PersistenceController.shared.delete(project: project)
-        } catch (let error) {
-            log.debug("\(error.localizedDescription)")
-            set(error: error)
         }
     }
 

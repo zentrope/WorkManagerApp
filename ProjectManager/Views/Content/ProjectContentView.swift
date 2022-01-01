@@ -41,9 +41,7 @@ struct ProjectContentView: View {
                     title: Text(#"Delete "\#(project.name)" and all its tasks?"#),
                     message: Text("This cannot be undone"),
                     primaryButton: .destructive(Text("Delete")) {
-                        Task {
-                            await state.delete(project: project)
-                        }
+                        state.delete(project: project)                        
                     },
                     secondaryButton: .cancel()
                 )

@@ -37,6 +37,10 @@ struct NewProjectView: View {
                     TextField("Project name", text: $name)
                         .textFieldStyle(.roundedBorder)
                         .frame(width: 300)
+                        .onSubmit {
+                            doSave = true
+                            dismiss()
+                        }
                 }
 
                 HStack(alignment: .center, spacing: 10) {

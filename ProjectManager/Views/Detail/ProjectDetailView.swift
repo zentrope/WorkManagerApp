@@ -7,11 +7,10 @@
 
 import SwiftUI
 
-// @TODO: Show the whole project and manage its lifecyle from this spot.
+// TODO: Show the whole project and manage its lifecyle from this spot.
 // When clicking "new" project, create a new one with a default title, then render it in this view where you can save it. Buttons along the bottom. Fill in the title along the topic. No need for a "sheet" for this one.
 
-// @TODO: Look at ScratchPad app for NSTextView editor help.
-
+// TODO: Look at ScratchPad app for NSTextView editor help.
 // https://www.swiftdevjournal.com/disable-a-text-field-in-a-swiftui-list-until-tapping-edit-button/
 
 
