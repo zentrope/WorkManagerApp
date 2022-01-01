@@ -131,7 +131,7 @@ final class AppState: NSObject, ObservableObject {
             projects = (projectCursor.fetchedObjects ?? []).map { .init(mo: $0 ) }
 
             try folderCursor.performFetch()
-            folders = (folderCursor.fetchedObjects ?? []).map { .init(mo: $0) }
+            folders = (folderCursor.fetchedObjects ?? []).map { .init(folderMO: $0) }
         } catch (let error) {
             logger.error("\(error.localizedDescription)")
         }

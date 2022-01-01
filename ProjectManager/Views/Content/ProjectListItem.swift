@@ -9,8 +9,6 @@ import SwiftUI
 
 struct ProjectListItem: View {
 
-// @TODO: Commented out section shows how to approach inline editing.
-
     var project: Project
 
     var body: some View {
@@ -26,7 +24,7 @@ struct ProjectListItem: View {
 
             }
         } icon: {
-            Image(systemName: "folder")
+            Image(systemName: "tag")
         }
         .padding(.vertical, 4)
     }

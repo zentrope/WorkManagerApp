@@ -35,8 +35,11 @@ struct Project: Identifiable, Hashable, CustomStringConvertible {
         self.isCompleted = mo.isCompleted
         self.dateCompleted = mo.dateCompleted
 
-        if let folder = mo.folder {
-            self.folder = Folder(mo: folder)
+        // This is a hack to prevent a circular dependency graph.
+        if let folder = mo.folder,
+           let name = folder.name,
+           let id = folder.id {
+            self.folder = Folder(id: id, name: name)
         } else {
             self.folder = Folder.noFolder
         }
@@ -48,7 +51,7 @@ struct Project: Identifiable, Hashable, CustomStringConvertible {
 extension ProjectMO {
 
     var wrappedTasks: [TaskMO] {
-        let array = tasks?.sortedArray(using: [NSSortDescriptor(key: "id", ascending: true)]) as? [TaskMO]
+        let array = tasks?.sortedArray(using: [NSSortDescriptor(key: "name", ascending: true)]) as? [TaskMO]
         if let values = array {
             return values
         }

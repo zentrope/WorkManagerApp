@@ -20,11 +20,11 @@ struct ContentView: View {
             EmptySelectionView(systemName: "folder", message: "No folder selected")
             EmptySelectionView(systemName: "folder", message: "No project selected")
         }
-        .navigationSubtitle(title)
+        //.navigationSubtitle(title)
     }
 
-    private var title: String {
-        let folder = appState.selectedFolder?.name ?? (appState.selectedStatus?.rawValue ?? "")
-        return "\(folder) Projects".trimmingCharacters(in: .whitespacesAndNewlines)
-    }
+//    private var title: String {
+//        let folder = appState.selectedFolder?.name ?? (appState.selectedStatus?.rawValue ?? "")
+//        return "\(folder) Projects".trimmingCharacters(in: .whitespacesAndNewlines)
+//    }
 }

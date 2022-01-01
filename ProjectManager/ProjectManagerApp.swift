@@ -18,8 +18,8 @@ struct ProjectManagerApp: App {
                 .environmentObject(appState)
                 .frame(minWidth: 1024, minHeight: 600)
         }
-        .windowStyle(.automatic)
-        .windowToolbarStyle(.unified(showsTitle: false))
+        .windowStyle(.titleBar)
+        .windowToolbarStyle(.unified(showsTitle: true))
         .commands {
             SidebarCommands()
         }
