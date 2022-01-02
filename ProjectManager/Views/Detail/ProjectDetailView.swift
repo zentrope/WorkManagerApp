@@ -30,65 +30,81 @@ struct ProjectDetailView: View {
 
     var body: some View {
 
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 0) {
 
-            // HEADING
-            VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .center, spacing: 10) {
 
-                // TITLE + ICON
-                HStack(alignment: .center, spacing: 10) {
-
-                    Text(viewState.project.name)
-                        .font(.title2)
-                        .bold()
+                VStack(alignment: .leading) {
+                Text(viewState.project.name)
+                    .font(.title2)
+                    .bold()
+                    .foregroundColor(.secondary)
+                    Text(viewState.project.folder.name)
+                        .font(.callout)
                         .foregroundColor(.secondary)
-                    Spacer()
-                    ProjectStatusIcon(done: viewState.project.doneCount, total: viewState.project.tasks.count)
-                        .foregroundColor(.accentColor)
-                        .font(.title)
+                        .italic()
                 }
-                .lineLimit(1)
 
+                Spacer()
+                ProjectStatusIcon(done: viewState.project.doneCount, total: viewState.project.tasks.count)
+                    .foregroundColor(.accentColor)
+                    .font(.largeTitle)
+            }
+            .lineLimit(1)
+
+            .padding(.top, 14) // Match content column's title
+            .padding([.horizontal, .bottom])
+
+            if viewState.project.tasks.count != 0 {
                 StatusView()
-                    .padding(.trailing, 10)
-                    .padding(.top, 5)
+                    .padding(.vertical, 5)
+                    .padding(.horizontal, 9)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(.gray.opacity(0.1))
+                    .cornerRadius(4, antialiased: true)
+                    .padding()
             }
-            .padding([.horizontal], 20)
-            .padding(.top, 11) // Match content column's title
 
-            ScrollView {
-                Divider()
-                ForEach(viewState.project.todoTasks, id: \.id) { task in
-                    TaskItemView(task: task) { task in
-                        viewState.toggle(task: task)
+            if viewState.project.tasks.count == 0 {
+                EmptySelectionView(systemName: "sparkles", message: "No tasks have been added to this project")
+            } else {
+                ScrollView {
+
+                    if viewState.project.todoCount > 0 {
+                        Heading("Available")
                     }
-                    .lineLimit(1)
-                    .padding(.bottom, 1)
-                    .padding(.horizontal, 20)
-                    .contextMenu {
-                        Button("Rename") {
-                            
+                    ForEach(viewState.project.todoTasks, id: \.id) { task in
+                        TaskItemView(task: task) { task in
+                            viewState.toggle(task: task)
+                        }
+                        .lineLimit(1)
+                        .padding(.bottom, 1)
+                        .padding(.horizontal, 20)
+                        .contextMenu {
+                            Button("Rename") {
+
+                            }
                         }
                     }
-                    Divider()
-                }
-                ForEach(viewState.project.doneTasks, id: \.id) { task in
-                    TaskItemView(task: task) { task in
-                        viewState.toggle(task: task)
-                    }
-                    .lineLimit(1)
-                    .padding(.bottom, 1)
-                    .padding(.horizontal, 20)
-                    .contextMenu {
-                        Button("Rename") {
 
+                    if viewState.project.doneCount > 0 {
+                        Heading("Completed")
+                    }
+                    ForEach(viewState.project.doneTasks, id: \.id) { task in
+                        TaskItemView(task: task) { task in
+                            viewState.toggle(task: task)
+                        }
+                        .lineLimit(1)
+                        .padding(.bottom, 1)
+                        .padding(.horizontal, 20)
+                        .contextMenu {
+                            Button("Rename") {
+
+                            }
                         }
                     }
-                    Divider()
                 }
-
             }
-            .padding(.bottom, 10)
         }
         .frame(minWidth: 400, maxWidth: .infinity, minHeight: 400)
         .background(Color(nsColor: .controlBackgroundColor))
@@ -100,7 +116,7 @@ struct ProjectDetailView: View {
                 Button {
                     showNewTaskForm.toggle()
                 } label: {
-                    Image(systemName: "text.badge.plus")
+                    Image(systemName: "plus")
                 }
                 .help("Create a new task")
             }
@@ -130,28 +146,24 @@ struct ProjectDetailView: View {
 
         let value: Double = (done == 0.0 || total == 0.0) ? 0.0 : (done == total) ? 1.0 : done / total
         HStack(alignment: .center, spacing: 5) {
-            switch value {
-                case 0.0:
-                    Text("Not started")
-                        .foregroundColor(.orange)
-                        .opacity(0.7)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                case 1.0:
-                    Text("Completed")
-                        .foregroundColor(.accentColor)
-                        .opacity(0.7)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                default:
-                    Group {
-                        Text(String(viewState.project.doneCount))
-                            .foregroundColor(.accentColor)
-                        ProgressView(value: value, total: 1)
-                        Text(String(viewState.project.todoCount))
-                            .foregroundColor(.orange)
-                    }
-            }
+            Text(String(viewState.project.doneCount))
+                .foregroundColor(.secondary)
+            ProgressView(value: value, total: 1)
+            Text(String(viewState.project.todoCount))
+                .foregroundColor(.secondary)
         }
-        .frame(height: 20) // prevent jitter
+    }
+
+    @ViewBuilder
+    private func Heading(_ text: String) -> some View {
+        Text(text)
+            .font(.body)
+            .padding(.vertical, 5)
+            .padding(.horizontal, 6)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(.gray.opacity(0.1))
+            .cornerRadius(4, antialiased: true)
+            .padding()
     }
 }
 
@@ -169,7 +181,7 @@ struct ProjectDetailView_Previews: PreviewProvider {
         let project = Project(
             name: "Test this view in a preview window",
             folder: folder, tasks: tasks
-        )        
+        )
         ProjectDetailView(preview: project)
     }
 }

@@ -19,6 +19,7 @@ import SwiftUI
 // TODO: Toggle project as completed (regardless of completed tasks)
 // TODO: Launch project in new window, toggle, kill main window, toggle is undone
 // TODO: Open to last selected project?
+// TODO: Create unique default task names (New Project 1, New Project 2, etc).
 
 @main
 struct ProjectManagerApp: App {

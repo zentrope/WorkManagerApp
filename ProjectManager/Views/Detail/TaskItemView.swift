@@ -12,21 +12,14 @@ struct TaskItemView: View {
     var onToggle: (ProjectTask) -> Void
     var body: some View {
         HStack(alignment: .center, spacing: 10) {
-            if (task.isCompleted) {
-                Image(systemName: "checkmark.circle")
-                    .foregroundColor(.secondary)
-                    .font(.title2.weight(.heavy))
-                    .onTapGesture {
-                        onToggle(task)
-                    }
-            } else {
-                Image(systemName: "circle")
-                    .foregroundColor(.orange)
-                    .font(.title2.weight(.heavy))
-                    .onTapGesture {
-                        onToggle(task)
-                    }
-            }
+            Image(systemName: task.isCompleted ? "checkmark.circle" : "circle")
+                .foregroundColor(task.isCompleted ? .secondary : .orange)
+                .opacity(task.isCompleted ? 0.5 : 1.0)
+                .font(.title2)
+                .onTapGesture {
+                    onToggle(task)
+                }
+                .onHover(perform: updateCursor)
             Group {
                 Text(task.name)
                 Spacer()
@@ -34,6 +27,15 @@ struct TaskItemView: View {
                     .font(.caption)
             }
             .foregroundColor(task.isCompleted ? .secondary : Color(nsColor: .textColor))
+            .opacity(task.isCompleted ? 0.5 : 1.0)
+        }
+    }
+
+    private func updateCursor(_ inside: Bool) {
+        if inside {
+            NSCursor.pointingHand.push()
+        } else {
+            NSCursor.pop()
         }
     }
 }
