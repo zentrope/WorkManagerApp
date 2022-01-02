@@ -13,6 +13,7 @@ fileprivate let log = Logger("SidebarViewState")
 final class SidebarViewState: NSObject, ObservableObject {
 
     @Published var folders = [Folder]()
+    @Published var selectedFolder: String?
     @Published var error: Error?
     @Published var hasError = false
 
@@ -38,6 +39,7 @@ final class SidebarViewState: NSObject, ObservableObject {
         Task {
             do {
                 try await PersistenceController.shared.insert(folder: folder)
+                await select(folderName: folder.name)
             } catch (let error) {
                 set(error: error)
             }
@@ -45,9 +47,11 @@ final class SidebarViewState: NSObject, ObservableObject {
     }
 
     func update(folder: Folder, name: String) {
+        let folderToSelect = folder.name == selectedFolder ? name : selectedFolder
         Task {
             do {
                 try await PersistenceController.shared.update(folder: folder, name: name)
+                await select(folderName: folderToSelect)
             } catch (let error) {
                 set(error: error)
             }
@@ -58,10 +62,18 @@ final class SidebarViewState: NSObject, ObservableObject {
         do {
             try folderCursor.performFetch()
             folders = (folderCursor.fetchedObjects ?? []).map { .init(folderMO: $0) }
+            if selectedFolder == nil {
+                selectedFolder = folders.first?.name
+            }
         } catch (let error) {
             set(error: error)
             log.error("\(error.localizedDescription)")
         }
+    }
+
+    @MainActor
+    private func select(folderName: String?) {
+        self.selectedFolder = folderName
     }
 
     private func set(error: Error) {

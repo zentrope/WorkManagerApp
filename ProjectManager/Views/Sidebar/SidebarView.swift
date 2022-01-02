@@ -14,7 +14,6 @@ struct SidebarView: View {
 
     @StateObject private var state = SidebarViewState()
 
-    @State private var selectedFolder: String?
     @State private var showEditFolderSheet = false
     @State private var folderToEdit: Folder?
     @State private var showNewFolderSheet = false
@@ -26,7 +25,7 @@ struct SidebarView: View {
             List {
                 Section(header: Text("Folders")) {
                     ForEach(state.folders, id: \.id) { folder in
-                        NavigationLink(destination: ProjectContentView(folder: folder), tag: folder.name, selection: $selectedFolder) {
+                        NavigationLink(destination: ProjectContentView(folder: folder), tag: folder.name, selection: $state.selectedFolder) {
                             Label(folder.name, systemImage: "folder")
                                 .badge(folder.projects.count)
                         }
@@ -63,25 +62,34 @@ struct SidebarView: View {
             FolderForm(mode: .update, name: $newFolderName, ok: $saveOk)
         }
         .alert("\(state.error?.localizedDescription ?? "Error!")", isPresented: $state.hasError) {}
-        .onAppear { selectedFolder = state.folders.first?.name }
     }
 
     private func handleFolderSave() {
         if saveOk {
-            state.save(folder: Folder(name: newFolderName))
-            selectedFolder = newFolderName
+            let name = newFolderName.trimmingCharacters(in: .whitespacesAndNewlines)
+            if name.isEmpty {
+                log.error("Cannot create a folder with a blank folder name.")
+                return
+            }
+            state.save(folder: Folder(name: name))
+            state.selectedFolder = newFolderName
         }
         newFolderName = ""
     }
 
     private func handleFolderUpdate() {
+        defer { newFolderName = "" }
         guard let folder = folderToEdit else {
-            log.debug("Unable to retrieve the folder we're updating.")
+            log.error("Unable to retrieve the folder we're updating.")
             return
         }
         if saveOk {
-            state.update(folder: folder, name: newFolderName)
+            let name = newFolderName.trimmingCharacters(in: .whitespacesAndNewlines)
+            if name.isEmpty {
+                log.error("Cannot update to a blank folder name.")
+                return
+            }
+            state.update(folder: folder, name: name)
         }
-        newFolderName = ""
     }
 }
