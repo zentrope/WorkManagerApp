@@ -12,7 +12,10 @@ struct SidebarView: View {
     @StateObject private var state = SidebarViewState()
 
     @State private var selectedFolder: String?
+
     @State private var showNewFolderSheet = false
+    @State private var newFolderName = ""
+    @State private var saveOk = false
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -41,7 +44,19 @@ struct SidebarView: View {
             .padding(10)
         }
         .frame(minWidth: 185, idealWidth: 185, maxHeight: .infinity, alignment: .leading)
-        .sheet(isPresented: $showNewFolderSheet, onDismiss: {}, content:{ NewFolderView() })
+        .sheet(isPresented: $showNewFolderSheet) {
+            handleFolderSave()
+        } content: {
+            NewFolderView(name: $newFolderName, ok: $saveOk)
+        }
         .onAppear { selectedFolder = state.folders.first?.name }
+    }
+
+    private func handleFolderSave() {
+        if saveOk {
+            state.save(folder: Folder(name: newFolderName))
+            selectedFolder = newFolderName
+        }
+        newFolderName = ""
     }
 }

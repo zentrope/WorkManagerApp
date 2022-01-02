@@ -10,10 +10,6 @@ import CoreData
 
 struct ContentView: View {
 
-    @EnvironmentObject private var appState: AppState
-    
-    @State private var showMakeProjectView = false
-
     var body: some View {
         NavigationView {
             SidebarView()

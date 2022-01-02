@@ -34,6 +34,16 @@ final class SidebarViewState: NSObject, ObservableObject {
         }
     }
 
+    func save(folder: Folder) {
+        Task {
+            do {
+                try await PersistenceController.shared.insert(folder: folder)
+            } catch (let error) {
+                set(error: error)
+            }
+        }
+    }
+
     private func reload() {
         do {
             try folderCursor.performFetch()
