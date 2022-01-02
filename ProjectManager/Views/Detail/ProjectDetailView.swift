@@ -33,6 +33,7 @@ struct ProjectDetailView: View {
         VStack(alignment: .leading, spacing: 20) {
 
             VStack(alignment: .leading, spacing: 6) {
+
                 HStack(alignment: .center, spacing: 10) {
 
                     Text(viewState.project.name)
@@ -46,26 +47,58 @@ struct ProjectDetailView: View {
                 }
                 .lineLimit(1)
                 HStack(alignment: .center, spacing: 10) {
-                    Text("\(viewState.project.tasks.count) items")
-                        .font(.callout)
-                        .foregroundColor(.secondary)
-                        .italic()
+                    // TODO: Use a progress-meter to show progress
+                    Group {
+                        Text("todo:")
+                            .foregroundColor(.orange)
+                            .font(.callout.smallCaps())
+                        Text(String(viewState.project.todoCount))
+                        Text("done:")
+                            .font(.callout.smallCaps())
+                        Text(String(viewState.project.doneCount))
+                    }
+                    .foregroundColor(.secondary)
                     Spacer()
                     Text(viewState.project.folder.name)
                         .font(.callout)
                         .foregroundColor(.secondary)
                 }
+                .font(.callout)
                 .padding(.horizontal, 3)
             }
             .padding([.horizontal, .top], 20)
 
             ScrollView {
-                ForEach(viewState.project.tasks, id: \.id) { task in
-                    TaskItemView(task: task)
-                        .lineLimit(1)
-                        .padding(.vertical, 2)
-                        .padding(.leading, 20)
+                Divider()
+                ForEach(viewState.project.todoTasks, id: \.id) { task in
+                    TaskItemView(task: task) { task in
+                        viewState.toggle(task: task)
+                    }
+                    .lineLimit(1)
+                    .padding(.bottom, 1)
+                    .padding(.horizontal, 20)
+                    .contextMenu {
+                        Button("Rename") {
+                            
+                        }
+                    }
+                    Divider()
                 }
+                ForEach(viewState.project.doneTasks, id: \.id) { task in
+                    TaskItemView(task: task) { task in
+                        viewState.toggle(task: task)
+                    }
+                    .lineLimit(1)
+                    .padding(.bottom, 1)
+                    .padding(.horizontal, 20)
+                    .contextMenu {
+                        Button("Rename") {
+
+                        }
+                    }
+                    Divider()
+                }
+
             }
             .padding(.bottom, 10)
         }
@@ -105,24 +138,16 @@ struct ProjectDetailView: View {
 
 struct ProjectDetailView_Previews: PreviewProvider {
     static var previews: some View {
+        let c1 = ProjectTask(name: "Clean kitchen sink.", completed: true)
+        let c2 = ProjectTask(name: "Figure out what to do with those filthy refrigerator shelves.", completed: true)
         let tasks = [
             ProjectTask(name: "Empty the garbage."),
             ProjectTask(name: "Walk the dog."),
             ProjectTask(name: "Sweep the floor."),
+            c1,
+            c2,
             ProjectTask(name: "Scrub down the dishwasher door."),
-            ProjectTask(name: "Empty the garbage."),
-            ProjectTask(name: "Walk the dog."),
-            ProjectTask(name: "Sweep the floor."),
-            ProjectTask(name: "Scrub down the dishwasher door."),
-            ProjectTask(name: "Empty the garbage."),
-            ProjectTask(name: "Walk the dog."),
-            ProjectTask(name: "Sweep the floor."),
-            ProjectTask(name: "Scrub down the dishwasher door."),
-            ProjectTask(name: "Empty the garbage."),
-            ProjectTask(name: "Walk the dog."),
-            ProjectTask(name: "Sweep the floor."),
-            ProjectTask(name: "Scrub down the dishwasher door."),
-        ]
+        ].sorted(by: { $0.name < $1.name })
         let folder = Folder(name: "Admin")
         let project = Project(
             name: "Test this view in a preview window",

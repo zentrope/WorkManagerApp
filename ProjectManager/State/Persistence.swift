@@ -88,16 +88,31 @@ struct PersistenceController {
         }
     }
 
+    func toggle(task: ProjectTask) async throws {
+        log.debug("Toggle \(task).")
+
+        let taskMO = try await find(task: task.id, context: updateContext)
+        taskMO.isCompleted.toggle()
+        if taskMO.isCompleted {
+            taskMO.dateCompleted = Date()
+        } else {
+            taskMO.dateCompleted = nil
+        }
+        try updateContext.save()
+    }
+
     // MARK: - Queries
 
     enum DataError: Error, LocalizedError {
-        case ProjectNotFound
         case FolderNotFound
+        case ProjectNotFound
+        case TaskNotFound
 
         var errorDescription: String? {
             switch self {
-                case .ProjectNotFound: return "Project not found."
                 case .FolderNotFound: return "Folder not found."
+                case .ProjectNotFound: return "Project not found."
+                case .TaskNotFound: return "Task not found."
             }
         }
     }
@@ -121,6 +136,17 @@ struct PersistenceController {
                 return project
             }
             throw DataError.ProjectNotFound
+        }
+    }
+
+    private func find(task id: UUID, context: NSManagedObjectContext) async throws -> TaskMO {
+        try await context.perform {
+            let request = TaskMO.fetchRequest()
+            request.predicate = NSPredicate(format: "id = %@", id as CVarArg)
+            if let projectTask = try context.fetch(request).first {
+                return projectTask
+            }
+            throw DataError.TaskNotFound
         }
     }
 

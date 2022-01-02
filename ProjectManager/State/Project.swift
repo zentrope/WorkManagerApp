@@ -16,10 +16,17 @@ struct Project: Identifiable, Hashable, CustomStringConvertible {
     var folder: Folder
     var tasks: [ProjectTask]
 
+    var doneCount: Int = 0
+    var todoCount: Int = 0
+
+    var doneTasks: [ProjectTask] = []
+    var todoTasks: [ProjectTask] = []
+
     var description: String {
         return #"Project(id: \#(id), name: "\#(name)", isCompleted: \#(isCompleted), dateCompleted: \#(String(describing: dateCompleted)), folder: \#(String(describing: folder)))"#
     }
 
+    /// Make a new project.
     init(name: String, folder: Folder, tasks: [ProjectTask] = []) {
         self.id = UUID()
         self.name = name
@@ -27,8 +34,13 @@ struct Project: Identifiable, Hashable, CustomStringConvertible {
         self.dateCompleted = nil
         self.folder = folder
         self.tasks = tasks
+        self.doneCount = tasks.filter { $0.isCompleted }.count
+        self.todoCount = self.tasks.count - self.doneCount
+        self.doneTasks = self.tasks.filter { $0.isCompleted }
+        self.todoTasks = self.tasks.filter { !$0.isCompleted }
     }
 
+    /// Make a Project based on the persisted Core Data ProjectMO Managed Object.
     init(mo: ProjectMO) {
         self.id = mo.id ?? UUID()
         self.name = mo.name ?? "Project \(self.id)"
@@ -45,6 +57,11 @@ struct Project: Identifiable, Hashable, CustomStringConvertible {
         }
 
         self.tasks = mo.wrappedTasks.map { .init(mo: $0) }
+
+        self.doneCount = tasks.filter { $0.isCompleted }.count
+        self.todoCount = self.tasks.count - self.doneCount
+        self.doneTasks = self.tasks.filter { $0.isCompleted }
+        self.todoTasks = self.tasks.filter { !$0.isCompleted }
     }
 }
 
