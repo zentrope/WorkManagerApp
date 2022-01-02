@@ -8,26 +8,42 @@
 import SwiftUI
 
 struct TaskItemView: View {
+
     var task: ProjectTask
     var onToggle: (ProjectTask) -> Void
+
+    @State private var flashChange = false
+
+    private var completed: Bool {
+        flashChange ? !task.isCompleted : task.isCompleted
+    }
+
+    private var completedDate: Date? {
+        (flashChange && task.dateCompleted != nil) ? nil : task.dateCompleted
+    }
+
     var body: some View {
         HStack(alignment: .center, spacing: 10) {
-            Image(systemName: task.isCompleted ? "checkmark.circle" : "circle")
-                .foregroundColor(task.isCompleted ? .secondary : .orange)
-                .opacity(task.isCompleted ? 0.5 : 1.0)
+            Image(systemName: completed ? "circle.inset.filled" : "circle")
+                .foregroundColor(completed ? .secondary : .orange)
+                .opacity(completed ? 0.5 : 1.0)
                 .font(.title2)
                 .onTapGesture {
-                    onToggle(task)
+                    flashChange = true
+                    Task {
+                        try await Task.sleep(nanoseconds: 1_000_000_000 / 5)
+                        onToggle(task)
+                    }
                 }
                 .onHover(perform: updateCursor)
             Group {
                 Text(task.name)
                 Spacer()
-                DateView(date: task.dateCompleted, format: .nameMonthDayYear, ifNil: "")
+                DateView(date: completedDate, format: .nameMonthDayYear, ifNil: "")
                     .font(.caption)
             }
-            .foregroundColor(task.isCompleted ? .secondary : Color(nsColor: .textColor))
-            .opacity(task.isCompleted ? 0.5 : 1.0)
+            .foregroundColor(completed ? .secondary : Color(nsColor: .textColor))
+            .opacity(completed ? 0.5 : 1.0)
         }
     }
 

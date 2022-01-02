@@ -73,6 +73,7 @@ struct ProjectDetailView: View {
                     if viewState.project.todoCount > 0 {
                         Heading("Available")
                     }
+
                     ForEach(viewState.project.todoTasks, id: \.id) { task in
                         TaskItemView(task: task) { task in
                             viewState.toggle(task: task)
@@ -81,15 +82,15 @@ struct ProjectDetailView: View {
                         .padding(.bottom, 1)
                         .padding(.horizontal, 20)
                         .contextMenu {
-                            Button("Rename") {
-
-                            }
+                            Button("Rename") {}
                         }
                     }
+                    .animation(.linear, value: viewState.project.todoTasks)
 
                     if viewState.project.doneCount > 0 {
                         Heading("Completed")
                     }
+
                     ForEach(viewState.project.doneTasks, id: \.id) { task in
                         TaskItemView(task: task) { task in
                             viewState.toggle(task: task)
@@ -98,11 +99,10 @@ struct ProjectDetailView: View {
                         .padding(.bottom, 1)
                         .padding(.horizontal, 20)
                         .contextMenu {
-                            Button("Rename") {
-
-                            }
+                            Button("Rename") {}
                         }
                     }
+                    .animation(.linear, value: viewState.project.doneTasks)
                 }
             }
         }
