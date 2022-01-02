@@ -47,6 +47,13 @@ struct PersistenceController {
         }
     }
 
+    /// Change folder name.
+    func update(folder: Folder, name: String) async throws {
+        let folderMO = try await find(folder: folder.id, context: updateContext)
+        folderMO.name = name
+        try updateContext.save()
+    }
+
     /// Create a project
     func insert(project: Project) async throws {
         log.debug("Upserting \(project)")

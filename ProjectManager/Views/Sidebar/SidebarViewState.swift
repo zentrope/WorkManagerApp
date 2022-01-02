@@ -44,6 +44,16 @@ final class SidebarViewState: NSObject, ObservableObject {
         }
     }
 
+    func update(folder: Folder, name: String) {
+        Task {
+            do {
+                try await PersistenceController.shared.update(folder: folder, name: name)
+            } catch (let error) {
+                set(error: error)
+            }
+        }
+    }
+
     private func reload() {
         do {
             try folderCursor.performFetch()

@@ -1,5 +1,5 @@
 //
-//  NewFolderView.swift
+//  FolderForm.swift
 //  ProjectManager
 //
 //  Created by Keith Irwin on 12/27/21.
@@ -7,20 +7,39 @@
 
 import SwiftUI
 
-struct NewFolderView: View {
+struct FolderForm: View {
+
+    enum Mode {
+        case create, update
+
+        var systemName: String {
+            switch self {
+                case .create: return "folder.badge.plus"
+                case .update: return "folder.badge.gear"
+            }
+        }
+
+        var title: String {
+            switch self {
+                case .create: return "New folder"
+                case .update: return "Update folder"
+            }
+        }
+    }
 
     @Environment(\.dismiss) private var dismiss
 
+    var mode: Mode
     @Binding var name: String
     @Binding var ok: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             HStack {
-                Image(systemName: "folder.badge.plus")
+                Image(systemName: mode.systemName)
                     .foregroundColor(.teal)
                     .font(.title)
-                Text("New folder")
+                Text(mode.title)
                     .bold()
                 Spacer()
             }
