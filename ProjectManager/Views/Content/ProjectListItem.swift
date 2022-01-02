@@ -16,20 +16,8 @@ struct ProjectListItem: View {
             Text(project.name)
                 .badge(project.tasks.count == 0 ? 0 : project.todoCount)
         } icon: {
-            StatusIcon()
+            ProjectStatusIcon(done: project.doneCount, total: project.tasks.count)
         }
         .padding(.vertical, 4)
-    }
-
-    @ViewBuilder
-    private func StatusIcon() -> some View {
-        switch project.doneCount {
-            case 0:
-                Image(systemName: "circle")
-            case project.tasks.count:
-                Image(systemName: "circle.inset.filled")
-            default:
-                Image(systemName: "circle.bottomhalf.filled")
-        }
     }
 }

@@ -22,8 +22,18 @@ struct ProjectContentView: View {
     @State private var saveNewProject = false
 
     var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
             List {
+                HStack(alignment: .center) {
+                    Text(folder.name)
+                        .bold()
+                    Spacer()
+                    Image(systemName: "folder")
+                }
+                .foregroundColor(.accentColor)
+                .font(.title2)
+                .padding(.bottom, 10)
+
                 ForEach(folder.projects, id: \.id) { project in
                     NavigationLink(destination: ProjectDetailView(project), tag: project.name, selection: $state.selectedProject) {
                         ProjectListItem(project: project)
@@ -71,7 +81,6 @@ struct ProjectContentView: View {
                 .help("Create a new project")
             }
         }
-        .navigationSubtitle(folder.name)
         .presentedWindowStyle(.titleBar)
         .presentedWindowToolbarStyle(.unified(showsTitle: true))
     }

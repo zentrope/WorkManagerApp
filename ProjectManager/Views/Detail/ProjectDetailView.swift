@@ -30,7 +30,7 @@ struct ProjectDetailView: View {
 
     var body: some View {
 
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 10) {
 
             // HEADING
             VStack(alignment: .leading, spacing: 6) {
@@ -39,28 +39,22 @@ struct ProjectDetailView: View {
                 HStack(alignment: .center, spacing: 10) {
 
                     Text(viewState.project.name)
-                        .font(.title)
+                        .font(.title2)
                         .bold()
                         .foregroundColor(.secondary)
                     Spacer()
-                    Image(systemName: "folder")
+                    ProjectStatusIcon(done: viewState.project.doneCount, total: viewState.project.tasks.count)
                         .foregroundColor(.accentColor)
                         .font(.title)
                 }
                 .lineLimit(1)
 
-                // Status + Folder
-                HStack(alignment: .center, spacing: 50) {
-                    StatusView()
-                    Spacer()
-                    Text(viewState.project.folder.name)
-                        .font(.callout)
-                        .foregroundColor(.secondary)
-                }
-                .padding(.horizontal, 3)
-                .padding(.top, 4)
+                StatusView()
+                    .padding(.trailing, 10)
+                    .padding(.top, 5)
             }
-            .padding([.horizontal, .top], 20)
+            .padding([.horizontal], 20)
+            .padding(.top, 11) // Match content column's title
 
             ScrollView {
                 Divider()
@@ -157,6 +151,7 @@ struct ProjectDetailView: View {
                     }
             }
         }
+        .frame(height: 20) // prevent jitter
     }
 }
 
@@ -165,9 +160,9 @@ struct ProjectDetailView_Previews: PreviewProvider {
         let tasks = [
             ProjectTask(name: "Empty the garbage.",                       completed: false),
             ProjectTask(name: "Walk the dog.",                            completed: false),
-            ProjectTask(name: "Sweep the floor.",                         completed: true),
+            ProjectTask(name: "Sweep the floor.",                         completed: false),
             ProjectTask(name: "Clean kitchen sink.",                      completed: false),
-            ProjectTask(name: "Clean those filthy refrigerator shelves.", completed: false),
+            ProjectTask(name: "Clean those filthy refrigerator shelves.", completed: true),
             ProjectTask(name: "Scrub down the dishwasher door.",          completed: false),
         ].sorted(by: { $0.name < $1.name })
         let folder = Folder(name: "Admin")

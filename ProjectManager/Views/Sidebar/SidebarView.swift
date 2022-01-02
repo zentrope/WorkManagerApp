@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// TODO: Add alert / error handling
+
 struct SidebarView: View {
 
     @StateObject private var state = SidebarViewState()
@@ -44,9 +46,7 @@ struct SidebarView: View {
             .padding(10)
         }
         .frame(minWidth: 185, idealWidth: 185, maxHeight: .infinity, alignment: .leading)
-        .sheet(isPresented: $showNewFolderSheet) {
-            handleFolderSave()
-        } content: {
+        .sheet(isPresented: $showNewFolderSheet, onDismiss: handleFolderSave) {
             NewFolderView(name: $newFolderName, ok: $saveOk)
         }
         .onAppear { selectedFolder = state.folders.first?.name }
