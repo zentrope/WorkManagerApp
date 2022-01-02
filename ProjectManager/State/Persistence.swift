@@ -14,7 +14,7 @@ struct PersistenceController {
 
     static let shared = PersistenceController()
 
-    private let logger = Logger( "PersistenceController")
+    private let log = Logger( "PersistenceController")
 
     let container: NSPersistentCloudKitContainer
 
@@ -38,7 +38,7 @@ struct PersistenceController {
 
     /// Create a new folder.
     func insert(folder: Folder) async throws {
-        logger.debug("Upserting \(folder)")
+        log.debug("Upserting \(folder)")
         try await updateContext.perform(schedule: .enqueued) {
             let folderMO = FolderMO(context: updateContext)
             folderMO.id = folder.id
@@ -49,7 +49,7 @@ struct PersistenceController {
 
     /// Create a project
     func insert(project: Project) async throws {
-        logger.debug("Upserting \(project)")
+        log.debug("Upserting \(project)")
 
         let folderMO = try await find(folder: project.folder.id, context: updateContext)
 
@@ -74,7 +74,7 @@ struct PersistenceController {
 
     /// Create a project task
     func add(task: ProjectTask, to project: Project) async throws {
-        logger.debug("Upserting \(task)")
+        log.debug("Upserting \(task)")
         let projectMO = try await find(project: project.id, context: updateContext)
 
         try await updateContext.perform(schedule: .enqueued) {

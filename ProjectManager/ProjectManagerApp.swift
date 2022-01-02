@@ -10,12 +10,9 @@ import SwiftUI
 @main
 struct ProjectManagerApp: App {
 
-    private let appState = AppState()
-
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(appState)
                 .frame(minWidth: 1024, minHeight: 600)
         }
         .windowStyle(.titleBar)

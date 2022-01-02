@@ -11,11 +11,11 @@ struct NewTaskView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    @EnvironmentObject private var appState: AppState
+    var project: String
+    var folder: String
 
-    var project: Project
-
-    @State private var name = ""
+    @Binding var name: String
+    @Binding var ok: Bool
 
     private let width: CGFloat = 500
 
@@ -39,14 +39,14 @@ struct NewTaskView: View {
                         .textFieldStyle(.squareBorder)
                         .frame(width: width, alignment: .leading)
                         .onSubmit { // hack due to .defaultAction not working on MacOS 12.1
-                            saveTask()
+                            handleSubmit(doSave: true)
                         }
                 }
 
                 HStack(alignment: .center, spacing: 10) {
                     Text("Project:")
                         .frame(width: 94, alignment: .trailing)
-                    Text(project.name)
+                    Text(project)
                         .foregroundColor(.secondary)
                         .frame(width: width, alignment: .leading)
                 }
@@ -54,7 +54,7 @@ struct NewTaskView: View {
                 HStack(alignment: .center, spacing: 10) {
                     Text("Folder:")
                         .frame(width: 94, alignment: .trailing)
-                    Text(project.folder.name)
+                    Text(folder)
                         .foregroundColor(.secondary)
                         .frame(width: width, alignment: .leading)
                 }
@@ -63,11 +63,11 @@ struct NewTaskView: View {
             HStack(alignment: .center, spacing: 20) {
                 Spacer()
                 Button("Cancel") {
-                    dismiss()
+                    handleSubmit(doSave: false)
                 }
                 .keyboardShortcut(.cancelAction)
                 Button("Save") {
-                    saveTask()
+                    handleSubmit(doSave: true)
                 }
                 .keyboardShortcut(.defaultAction)
                 .disabled(name.isEmpty)
@@ -77,20 +77,14 @@ struct NewTaskView: View {
         .fixedSize()
     }
 
-    private func saveTask() {
-        // TODO: Move new task to ProjectDetailViewState.
-        let task = ProjectTask(name: name)
-        Task {
-            await appState.save(task: task, in: project)
-        }
+    private func handleSubmit(doSave: Bool) {
+        ok = doSave
         dismiss()
     }
 }
 
 struct NewTaskView_Previews: PreviewProvider {
     static var previews: some View {
-        let folder = Folder(name: "Test")
-        let project = Project(name: "Test Project", folder: folder)
-        NewTaskView(project: project)
+        NewTaskView(project: "Test Project", folder: "Chores", name: .constant("Take out the garbage."), ok: .constant(true))
     }
 }

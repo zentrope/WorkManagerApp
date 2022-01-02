@@ -8,20 +8,19 @@
 import SwiftUI
 
 // TODO: Show the whole project and manage its lifecyle from this spot.
-// When clicking "new" project, create a new one with a default title, then render it in this view where you can save it. Buttons along the bottom. Fill in the title along the topic. No need for a "sheet" for this one.
-
 // TODO: Look at ScratchPad app for NSTextView editor help.
 // https://www.swiftdevjournal.com/disable-a-text-field-in-a-swiftui-list-until-tapping-edit-button/
-
 
 struct ProjectDetailView: View {
 
     @StateObject private var viewState: ProjectDetailViewState
 
+    // New Task
     @State private var showNewTaskForm = false
+    @State private var taskName = ""
+    @State private var doSaveTask = false
 
     init(_ project: Project) {
-        // There's controversy about whether or not this is a legit thing to do. Here's what I'm thinking: Although this initializer might be called multiple times to render changes, the StateObject will only be initialized the first time, and never again until this view disappears from the view hierarchy. Therefore, we can initialize it in this way. When the user double-clicks the row in the content column, this object will spawn a new window, which requires a new viewState so that it can register changes independently of the main window. Anyway, this seems to be working. The reason I don't set the viewState property from the main window is that if we close the main window, the spawned window's data goes away.
         self._viewState = StateObject(wrappedValue: ProjectDetailViewState(project: project))
     }
 
@@ -85,8 +84,8 @@ struct ProjectDetailView: View {
                 .help("Create a new task")
             }
         }
-        .sheet(isPresented: $showNewTaskForm, onDismiss: {}) {
-            NewTaskView(project: viewState.project)
+        .sheet(isPresented: $showNewTaskForm, onDismiss: saveTask) {
+            NewTaskView(project: viewState.project.name, folder: viewState.project.folder.name, name: $taskName, ok: $doSaveTask)
         }
         .navigationTitle(viewState.project.name)
         .navigationSubtitle(viewState.project.folder.name)
@@ -94,6 +93,13 @@ struct ProjectDetailView: View {
         .alert("ProjectDetailView: \(viewState.error?.localizedDescription ?? "Error")", isPresented: $viewState.hasError) {
             Button("Ok", role: .cancel) { }
         }
+    }
+
+    private func saveTask() {
+        defer { taskName = "" }
+        guard doSaveTask else { return }
+        let task = ProjectTask(name: taskName)
+        viewState.save(task: task)
     }
 }
 
