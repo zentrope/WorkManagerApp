@@ -36,6 +36,11 @@ struct SidebarView: View {
                                 saveOk = false
                                 showEditFolderSheet.toggle()
                             }
+                            if folder.projects.count == 0 {
+                                Button("Delete") {
+                                    state.delete(folder: folder)
+                                }
+                            }
                         }
                     }
                 }
@@ -72,7 +77,6 @@ struct SidebarView: View {
                 return
             }
             state.save(folder: Folder(name: name))
-            state.selectedFolder = newFolderName
         }
         newFolderName = ""
     }

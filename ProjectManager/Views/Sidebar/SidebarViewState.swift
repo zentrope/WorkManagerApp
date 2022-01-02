@@ -35,6 +35,17 @@ final class SidebarViewState: NSObject, ObservableObject {
         }
     }
 
+    func delete(folder: Folder) {
+        Task {
+            do {
+                try await PersistenceController.shared.delete(folder: folder)
+                await select(folderName: folders.first?.name)
+            } catch (let error) {
+                set(error: error)
+            }
+        }
+    }
+
     func save(folder: Folder) {
         Task {
             do {

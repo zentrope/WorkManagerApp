@@ -13,12 +13,12 @@ import SwiftUI
 // TODO: Revise to work with CloudKit.
 // TODO: Add filters
 // TODO: Rename projects
-// TODO: Rename folders
 // TODO: Rename tasks
 // TODO: Allow task date override
 // TODO: Toggle project as completed (regardless of completed tasks)
-// TODO: Launch project in new window, toggle, kill main window, toggle is undone
+// TODO: Fix: Launch project in new window, toggle, kill main window, toggle is undone
 // TODO: Open to last selected project?
+// TODO: Open to last selected folder?
 // TODO: Create unique default task names (New Project 1, New Project 2, etc).
 
 @main

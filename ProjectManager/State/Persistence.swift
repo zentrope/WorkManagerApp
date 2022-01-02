@@ -71,6 +71,15 @@ struct PersistenceController {
         }
     }
 
+    func delete(folder: Folder) async throws {
+        let folderMO = try await find(folder: folder.id, context: updateContext)
+        if folderMO.projects?.count != 0 {
+            throw DataError.FolderNotEmpty
+        }
+        updateContext.delete(folderMO)
+        try updateContext.save()
+    }
+
     func delete(project: Project) async throws {
         let projectMO = try await find(project: project.id, context: updateContext)
         try await updateContext.perform(schedule: .enqueued) {
@@ -114,12 +123,14 @@ struct PersistenceController {
         case FolderNotFound
         case ProjectNotFound
         case TaskNotFound
+        case FolderNotEmpty
 
         var errorDescription: String? {
             switch self {
                 case .FolderNotFound: return "Folder not found."
                 case .ProjectNotFound: return "Project not found."
                 case .TaskNotFound: return "Task not found."
+                case .FolderNotEmpty: return "Cannot delete a folder with projects in it."
             }
         }
     }
