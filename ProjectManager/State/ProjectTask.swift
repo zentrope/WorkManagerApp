@@ -29,8 +29,8 @@ struct ProjectTask: Identifiable, Hashable, CustomStringConvertible {
     init(name: String, completed: Bool) {
         self.id = UUID()
         self.name = name
-        self.isCompleted = true
-        self.dateCompleted = Date()
+        self.isCompleted = completed
+        self.dateCompleted = completed ? Date() : nil
     }
 
     /// Make a ProjectTask based on the TaskMO, a Core Data Managed Object.

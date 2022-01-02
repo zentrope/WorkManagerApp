@@ -32,8 +32,10 @@ struct ProjectDetailView: View {
 
         VStack(alignment: .leading, spacing: 20) {
 
+            // HEADING
             VStack(alignment: .leading, spacing: 6) {
 
+                // TITLE + ICON
                 HStack(alignment: .center, spacing: 10) {
 
                     Text(viewState.project.name)
@@ -46,25 +48,17 @@ struct ProjectDetailView: View {
                         .font(.title)
                 }
                 .lineLimit(1)
-                HStack(alignment: .center, spacing: 10) {
-                    // TODO: Use a progress-meter to show progress
-                    Group {
-                        Text("todo:")
-                            .foregroundColor(.orange)
-                            .font(.callout.smallCaps())
-                        Text(String(viewState.project.todoCount))
-                        Text("done:")
-                            .font(.callout.smallCaps())
-                        Text(String(viewState.project.doneCount))
-                    }
-                    .foregroundColor(.secondary)
+
+                // Status + Folder
+                HStack(alignment: .center, spacing: 50) {
+                    StatusView()
                     Spacer()
                     Text(viewState.project.folder.name)
                         .font(.callout)
                         .foregroundColor(.secondary)
                 }
-                .font(.callout)
                 .padding(.horizontal, 3)
+                .padding(.top, 4)
             }
             .padding([.horizontal, .top], 20)
 
@@ -134,19 +128,47 @@ struct ProjectDetailView: View {
         let task = ProjectTask(name: taskName)
         viewState.save(task: task)
     }
+
+    @ViewBuilder
+    private func StatusView() -> some View {
+        let done = Double(viewState.project.doneCount)
+        let total = Double(viewState.project.tasks.count)
+
+        let value: Double = (done == 0.0 || total == 0.0) ? 0.0 : (done == total) ? 1.0 : done / total
+        HStack(alignment: .center, spacing: 5) {
+            switch value {
+                case 0.0:
+                    Text("Not started")
+                        .foregroundColor(.orange)
+                        .opacity(0.7)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                case 1.0:
+                    Text("Completed")
+                        .foregroundColor(.accentColor)
+                        .opacity(0.7)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                default:
+                    Group {
+                        Text(String(viewState.project.doneCount))
+                            .foregroundColor(.accentColor)
+                        ProgressView(value: value, total: 1)
+                        Text(String(viewState.project.todoCount))
+                            .foregroundColor(.orange)
+                    }
+            }
+        }
+    }
 }
 
 struct ProjectDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        let c1 = ProjectTask(name: "Clean kitchen sink.", completed: true)
-        let c2 = ProjectTask(name: "Figure out what to do with those filthy refrigerator shelves.", completed: true)
         let tasks = [
-            ProjectTask(name: "Empty the garbage."),
-            ProjectTask(name: "Walk the dog."),
-            ProjectTask(name: "Sweep the floor."),
-            c1,
-            c2,
-            ProjectTask(name: "Scrub down the dishwasher door."),
+            ProjectTask(name: "Empty the garbage.",                       completed: false),
+            ProjectTask(name: "Walk the dog.",                            completed: false),
+            ProjectTask(name: "Sweep the floor.",                         completed: true),
+            ProjectTask(name: "Clean kitchen sink.",                      completed: false),
+            ProjectTask(name: "Clean those filthy refrigerator shelves.", completed: false),
+            ProjectTask(name: "Scrub down the dishwasher door.",          completed: false),
         ].sorted(by: { $0.name < $1.name })
         let folder = Folder(name: "Admin")
         let project = Project(

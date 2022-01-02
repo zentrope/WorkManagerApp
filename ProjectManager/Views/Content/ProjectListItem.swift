@@ -13,19 +13,23 @@ struct ProjectListItem: View {
 
     var body: some View {
         Label {
-            HStack(alignment: .center) {
-                Text(project.name)
-                    .lineLimit(1)
-                Spacer()
-                Text(project.folder.name)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .lineLimit(1)
-
-            }
+            Text(project.name)
+                .badge(project.tasks.count == 0 ? 0 : project.todoCount)
         } icon: {
-            Image(systemName: "tag")
+            StatusIcon()
         }
         .padding(.vertical, 4)
+    }
+
+    @ViewBuilder
+    private func StatusIcon() -> some View {
+        switch project.doneCount {
+            case 0:
+                Image(systemName: "circle")
+            case project.tasks.count:
+                Image(systemName: "circle.inset.filled")
+            default:
+                Image(systemName: "circle.bottomhalf.filled")
+        }
     }
 }

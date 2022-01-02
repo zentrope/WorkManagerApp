@@ -7,6 +7,9 @@
 
 import SwiftUI
 
+// TODO: Rename this to WorkManager
+// TODO: Add TitleUtils to better handle navigationTitle issues.
+
 @main
 struct ProjectManagerApp: App {
 

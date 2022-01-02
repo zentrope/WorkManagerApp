@@ -60,9 +60,7 @@ struct ProjectContentView: View {
         } content: {
             NewProjectView(name: $newProjectName, doSave: $saveNewProject, folderName: folder.name)
         }
-        .alert("ContentView: \(state.error?.localizedDescription ?? "Error")", isPresented: $state.hasError) {
-
-        }
+        .alert("\(state.error?.localizedDescription ?? "Error")", isPresented: $state.hasError) {}
         .toolbar {
             ToolbarItem {
                 Button {
