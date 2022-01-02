@@ -7,9 +7,7 @@
 
 import SwiftUI
 
-// TODO: Show the whole project and manage its lifecyle from this spot.
 // TODO: Look at ScratchPad app for NSTextView editor help.
-// https://www.swiftdevjournal.com/disable-a-text-field-in-a-swiftui-list-until-tapping-edit-button/
 
 struct ProjectDetailView: View {
 

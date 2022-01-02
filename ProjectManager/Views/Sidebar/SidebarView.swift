@@ -14,6 +14,9 @@ struct SidebarView: View {
 
     @StateObject private var state = SidebarViewState()
 
+    @State private var showDeleteConfirm = false
+    @State private var folderToDelete: Folder?
+
     @State private var showEditFolderSheet = false
     @State private var folderToEdit: Folder?
     @State private var showNewFolderSheet = false
@@ -38,7 +41,8 @@ struct SidebarView: View {
                             }
                             if folder.projects.count == 0 {
                                 Button("Delete") {
-                                    state.delete(folder: folder)
+                                    folderToDelete = folder
+                                    showDeleteConfirm.toggle()
                                 }
                             }
                         }
@@ -46,6 +50,7 @@ struct SidebarView: View {
                 }
             }
             .listStyle(.sidebar)
+            .alert(item: $folderToDelete) { deleteAlert(folder: $0) }
             Spacer()
             HStack(alignment: .center) {
                 Button {
@@ -67,6 +72,17 @@ struct SidebarView: View {
             FolderForm(mode: .update, name: $newFolderName, ok: $saveOk)
         }
         .alert("\(state.error?.localizedDescription ?? "Error!")", isPresented: $state.hasError) {}
+    }
+
+    private func deleteAlert(folder: Folder) -> Alert {
+        Alert(
+            title: Text("Delete '\(folder.name)'?"),
+            message: Text("This cannot be undone."),
+            primaryButton: .destructive(Text("Delete")) {
+                state.delete(folder: folder)
+            },
+            secondaryButton: .cancel()
+        )
     }
 
     private func handleFolderSave() {
