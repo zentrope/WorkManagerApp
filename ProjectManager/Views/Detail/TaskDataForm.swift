@@ -7,10 +7,29 @@
 
 import SwiftUI
 
-struct NewTaskView: View {
+struct TaskDataForm: View {
+
+    enum Mode {
+        case create, update
+
+        var systemName: String {
+            switch self {
+                case .create: return "text.badge.plus"
+                case .update: return "square.and.pencil"
+            }
+        }
+
+        var title: String {
+            switch self {
+                case .create: return "Create"
+                case .update: return "Rename"
+            }
+        }
+    }
 
     @Environment(\.dismiss) private var dismiss
 
+    var mode: Mode
     var project: String
     var folder: String
 
@@ -22,10 +41,10 @@ struct NewTaskView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             HStack {
-                Image(systemName: "text.badge.plus")
+                Image(systemName: mode.systemName)
                     .foregroundColor(.teal)
                     .font(.title)
-                Text("New task")
+                Text("\(mode.title) task")
                     .bold()
                 Spacer()
             }
@@ -66,7 +85,7 @@ struct NewTaskView: View {
                     handleSubmit(doSave: false)
                 }
                 .keyboardShortcut(.cancelAction)
-                Button("Save") {
+                Button(mode.title) {
                     handleSubmit(doSave: true)
                 }
                 .keyboardShortcut(.defaultAction)
@@ -85,6 +104,6 @@ struct NewTaskView: View {
 
 struct NewTaskView_Previews: PreviewProvider {
     static var previews: some View {
-        NewTaskView(project: "Test Project", folder: "Chores", name: .constant("Take out the garbage."), ok: .constant(true))
+        TaskDataForm(mode: .update, project: "Test Project", folder: "Chores", name: .constant("Take out the garbage."), ok: .constant(true))
     }
 }

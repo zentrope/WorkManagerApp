@@ -54,6 +54,13 @@ struct PersistenceController {
         try updateContext.save()
     }
 
+    /// Change task name
+    func update(task: ProjectTask, name: String) async throws {
+        let taskMO = try await find(task: task.id, context: updateContext)
+        taskMO.name = name
+        try updateContext.save()
+    }
+
     /// Create a project
     func insert(project: Project) async throws {
         log.debug("Upserting \(project)")

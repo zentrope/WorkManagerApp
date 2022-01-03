@@ -14,10 +14,8 @@ import SwiftUI
 // TODO: Add filters (all, closed, open, 2021, 2022)
 // TODO: Rename projects
 // TODO: Move project to new folder (drag drop?)
-// TODO: Rename tasks
 // TODO: Delete tasks
 // TODO: Allow task date override
-// TODO: Toggle project as completed (regardless of completed tasks)
 // TODO: Fix: Launch project in new window, toggle, kill main window, toggle is undone
 // TODO: Open to last selected project?  @AppStorage
 // TODO: Open to last selected folder?  @AppStorage

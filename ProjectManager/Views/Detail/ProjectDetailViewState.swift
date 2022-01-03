@@ -29,6 +29,17 @@ class ProjectDetailViewState: NSObject, ObservableObject {
         }
     }
 
+    func rename(task: ProjectTask, name: String) {
+        Task {
+            do {
+                try await PersistenceController.shared.update(task: task, name: name)
+            } catch (let error) {
+                log.error("\(error.localizedDescription)")
+                await set(error: error)
+            }
+        }
+    }
+
     func save(task: ProjectTask) {
         Task {
             do {

@@ -13,10 +13,12 @@ struct ProjectDetailView: View {
 
     @StateObject private var state: ProjectDetailViewState
 
-    // New Task
+    // Task maintenance
     @State private var showNewTaskForm = false
+    @State private var showEditTaskForm = false
     @State private var taskName = ""
     @State private var doSaveTask = false
+    @State private var taskToEdit: ProjectTask?
 
     init(_ project: Project) {
         self._state = StateObject(wrappedValue: ProjectDetailViewState(project: project))
@@ -57,7 +59,6 @@ struct ProjectDetailView: View {
                     }
             }
             .lineLimit(1)
-
             .padding(.top, 14) // Match content column's title
             .padding([.horizontal])
 
@@ -94,7 +95,7 @@ struct ProjectDetailView: View {
                         .padding(.bottom, 1)
                         .padding(.horizontal, 20)
                         .contextMenu {
-                            Button("Rename") {}
+                            Button("Rename", action: { handleRename(task) })
                         }
                     }
 
@@ -108,7 +109,7 @@ struct ProjectDetailView: View {
                         .padding(.bottom, 1)
                         .padding(.horizontal, 20)
                         .contextMenu {
-                            Button("Rename") {}
+                            Button("Rename", action: { handleRename(task) })
                         }
                     }
                 }
@@ -130,7 +131,10 @@ struct ProjectDetailView: View {
             }
         }
         .sheet(isPresented: $showNewTaskForm, onDismiss: saveTask) {
-            NewTaskView(project: state.project.name, folder: state.project.folder.name, name: $taskName, ok: $doSaveTask)
+            TaskDataForm(mode: .create, project: state.project.name, folder: state.project.folder.name, name: $taskName, ok: $doSaveTask)
+        }
+        .sheet(isPresented: $showEditTaskForm, onDismiss: editTask) {
+            TaskDataForm(mode: .update, project: state.project.name, folder: state.project.folder.name, name: $taskName, ok: $doSaveTask)
         }
         .navigationTitle(state.project.name)
         .navigationSubtitle(state.project.folder.name)
@@ -140,13 +144,33 @@ struct ProjectDetailView: View {
         }
     }
 
+    private func handleRename(_ task: ProjectTask) {
+        taskToEdit = task
+        taskName = task.name
+        showEditTaskForm.toggle()
+    }
+
     private func saveTask() {
         defer { taskName = "" }
         guard doSaveTask else { return }
-        let task = ProjectTask(name: taskName)
+        let name = taskName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if name.isEmpty {
+            return
+        }
+        let task = ProjectTask(name: name)
         state.save(task: task)
     }
 
+    private func editTask() {
+        defer { taskName = "" }
+        guard doSaveTask else { return }
+        guard let todo = taskToEdit else { return }
+        let name = taskName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if name.isEmpty {
+            return
+        }
+        state.rename(task: todo, name: name)
+    }
 
     @ViewBuilder
     private func StatusView() -> some View {
