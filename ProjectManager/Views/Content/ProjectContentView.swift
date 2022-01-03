@@ -25,49 +25,61 @@ struct ProjectContentView: View {
     @State private var saveNewProject = false
 
     var body: some View {
-        VStack(alignment: .leading) {
-            List {
+        VStack(alignment: .leading, spacing: 0) {
 
-                HStack(alignment: .center) {
+            // Everything goes in the list because we can't make the list background color
+            // match Label colors. The implicit intention is that Lists take up the entire
+            // view for a NavigationView column.
+
+            List {
+                HStack(alignment: .center, spacing: 4) {
+                    Image(systemName: "folder")
                     Text(folder.name)
                         .bold()
                     Spacer()
-                    Image(systemName: "folder")
+
                 }
                 .foregroundColor(.accentColor)
                 .font(.title2)
-                .padding(.bottom, 0)
+                .padding(.vertical)
 
                 if folder.todo.count > 0 {
-                    Section(header: Text("Available")) {
-                        ForEach(folder.todo, id: \.id) { project in
-                            NavigationLink(destination: ProjectDetailView(project), tag: project.name, selection: $state.selectedTodo) {
-                                ProjectListItem(project: project)
+                    Text("Available")
+                        .font(.callout)
+                        .bold()
+                        .foregroundColor(.secondary)
+
+                    ForEach(folder.todo, id: \.id) { project in
+                        NavigationLink(destination: ProjectDetailView(project), tag: project.name, selection: $state.selectedTodo) {
+                            ProjectListItem(project: project)
+                        }
+                        .contextMenu {
+                            Button("Delete") {
+                                projectToDelete = project
                             }
-                            .contextMenu {
-                                Button("Delete") {
-                                    projectToDelete = project
-                                }
-                                Button("Mark completed") {
-                                    state.toggle(project: project)
-                                }
+                            Button("Mark completed") {
+                                state.toggle(project: project)
                             }
                         }
                     }
                 }
                 if folder.done.count > 0 {
-                    Section(header: Text("Completed")) {
-                        ForEach(folder.done, id: \.id) { project in
-                            NavigationLink(destination: ProjectDetailView(project), tag: project.name, selection: $state.selectedDone) {
-                                ProjectDoneItem(project: project)
+                    Text("Completed")
+                        .font(.callout)
+                        .bold()
+                        .foregroundColor(.secondary)
+                        .padding(.top)
+
+                    ForEach(folder.done, id: \.id) { project in
+                        NavigationLink(destination: ProjectDetailView(project), tag: project.name, selection: $state.selectedDone) {
+                            ProjectDoneItem(project: project)
+                        }
+                        .contextMenu {
+                            Button("Delete") {
+                                projectToDelete = project
                             }
-                            .contextMenu {
-                                Button("Delete") {
-                                    projectToDelete = project
-                                }
-                                Button("Mark available") {
-                                    state.toggle(project: project)
-                                }
+                            Button("Mark available") {
+                                state.toggle(project: project)
                             }
                         }
                     }

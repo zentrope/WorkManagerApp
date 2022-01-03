@@ -30,92 +30,61 @@ struct ProjectDetailView: View {
 
     var body: some View {
 
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading) {
+            LocationView()
+                .padding([.top, .horizontal])
+                .padding(.bottom, 2)
 
-            HStack(alignment: .top, spacing: 10) {
-
-                Text(state.project.name)
-                    .font(.title2)
-                    .bold()
-                    .foregroundColor(.accentColor)
-                    .foregroundColor(state.project.isCompleted ? .secondary : .accentColor)
-
-                Spacer()
-
-                Image(systemName: state.project.isCompleted ? "checkmark.circle" : "circle")
-                    .font(.title2)
-                    .foregroundColor(state.project.isCompleted ? .secondary : .orange)
-                    .onTapGesture {
-                        Task {
-                            state.toggle(project: state.project)
-                        }
-                    }
-                    .onHover { inside in
-                        if inside {
-                            NSCursor.pointingHand.push()
-                        } else {
-                            NSCursor.pop()
-                        }
-                    }
-            }
-            .lineLimit(1)
-            .padding(.top, 14) // Match content column's title
-            .padding([.horizontal])
-
-            Text(state.project.folder.name)
-                .font(.callout)
-                .foregroundColor(.secondary)
+            TitleView()
                 .padding(.horizontal)
 
-            if !state.project.isCompleted && state.project.tasks.count != 0 {
-                StatusView()
-                    .padding(.vertical, 5)
-                    .padding(.horizontal, 9)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(.gray.opacity(0.1))
-                    .cornerRadius(4, antialiased: true)
-                    .padding()
-            }
+            StatusView(render: !state.project.isCompleted && state.project.tasks.count != 0)
+                .padding()
 
-            if state.project.tasks.count == 0 {
-                EmptySelectionView(systemName: "sparkles", message: "No tasks have been added to this project")
-            }
+            ScrollView {
 
-            if state.project.tasks.count > 0 {
-                ScrollView {
+                Heading("Unfinished", renderIf: state.project.todoCount > 0 && state.project.isCompleted)
+                    .padding([.horizontal, .bottom, .top])
 
-                    Heading("Unfinished", renderIf: state.project.todoCount > 0 && state.project.isCompleted)
-                    Heading("Available", renderIf: state.project.todoCount > 0 && !state.project.isCompleted)
+                Heading("Available", renderIf: state.project.todoCount > 0 && !state.project.isCompleted)
+                    .padding([.horizontal, .bottom, .top])
 
-                    ForEach(state.project.todoTasks, id: \.id) { task in
-                        TaskItemView(project: state.project, task: task) { task in
-                            state.toggle(task: task)
-                        }
-                        .lineLimit(1)
-                        .padding(.bottom, 1)
-                        .padding(.horizontal, 20)
-                        .contextMenu {
-                            Button("Rename", action: { handleRename(task) })
-                        }
+                ForEach(state.project.todoTasks, id: \.id) { task in
+                    TaskItemView(project: state.project, task: task) { task in
+                        state.toggle(task: task)
                     }
+                    .padding(.horizontal)
+                    .lineLimit(1)
+                    .padding(.bottom, 2)
+                    .contextMenu {
+                        Button("Rename", action: { handleRename(task) })
+                    }
+                    .onHover { inside in
+                        if inside { NSCursor.contextualMenu.push() } else { NSCursor.pop() }
+                    }
+                }
 
-                    Heading("Completed", renderIf: state.project.doneCount > 0)
+                Heading("Completed", renderIf: state.project.doneCount > 0)
+                    .padding()
+                    .padding(.top, 5) // a little extra
 
-                    ForEach(state.project.doneTasks, id: \.id) { task in
-                        TaskItemView(project: state.project, task: task) { task in
-                            state.toggle(task: task)
-                        }
-                        .lineLimit(1)
-                        .padding(.bottom, 1)
-                        .padding(.horizontal, 20)
-                        .contextMenu {
-                            Button("Rename", action: { handleRename(task) })
-                        }
+                ForEach(state.project.doneTasks, id: \.id) { task in
+                    TaskItemView(project: state.project, task: task) { task in
+                        state.toggle(task: task)
+                    }
+                    .lineLimit(1)
+                    .padding(.horizontal)
+                    .padding(.bottom, 2)
+                    .contextMenu {
+                        Button("Rename", action: { handleRename(task) })
+                    }
+                    .onHover { inside in
+                        if inside { NSCursor.contextualMenu.push() } else { NSCursor.pop() }
                     }
                 }
             }
         }
-        .frame(minWidth: 400, maxWidth: .infinity, minHeight: 400)
+        .frame(minWidth: 400, maxWidth: .infinity, minHeight: 400, maxHeight: .infinity)
         .background(Color(nsColor: .controlBackgroundColor))
         .toolbar {
             ToolbarItemGroup {
@@ -173,17 +142,64 @@ struct ProjectDetailView: View {
     }
 
     @ViewBuilder
-    private func StatusView() -> some View {
-        let done = Double(state.project.doneCount)
-        let total = Double(state.project.tasks.count)
+    private func LocationView() -> some View {
+        HStack(alignment: .center, spacing: 6) {
+            Image(systemName: "folder")
+            Text(state.project.folder.name)
+            Spacer()
+            Image(systemName: state.project.isCompleted ? "checkmark.circle" : "circle")
+                .font(.title2)
+                .foregroundColor(state.project.isCompleted ? .secondary : .orange)
+                .onTapGesture {
+                    Task {
+                        state.toggle(project: state.project)
+                    }
+                }
+                .onHover { inside in
+                    if inside {
+                        NSCursor.pointingHand.push()
+                    } else {
+                        NSCursor.pop()
+                    }
+                }
+        }
+        .font(.callout)
+        .foregroundColor(.secondary)
+    }
 
-        let value: Double = (done == 0.0 || total == 0.0) ? 0.0 : (done == total) ? 1.0 : done / total
-        HStack(alignment: .center, spacing: 5) {
-            Text(String(state.project.doneCount))
-                .foregroundColor(.secondary)
-            ProgressView(value: value, total: 1)
-            Text(String(state.project.todoCount))
-                .foregroundColor(.secondary)
+    @ViewBuilder
+    private func TitleView() -> some View {
+        Text(state.project.name)
+            .font(.title2)
+            .bold()
+            .foregroundColor(.accentColor)
+            .foregroundColor(state.project.isCompleted ? .secondary : .accentColor)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .lineLimit(1)
+    }
+
+    @ViewBuilder
+    private func StatusView(render: Bool) -> some View {
+        if render {
+            let done = Double(state.project.doneCount)
+            let total = Double(state.project.tasks.count)
+
+            let value: Double = (done == 0.0 || total == 0.0) ? 0.0 : (done == total) ? 1.0 : done / total
+            HStack(alignment: .center, spacing: 5) {
+                Text(String(state.project.doneCount))
+                    .foregroundColor(.secondary)
+                ProgressView(value: value, total: 1)
+                Text(String(state.project.todoCount))
+                    .foregroundColor(.secondary)
+            }
+            .padding(.vertical, 5)
+            .padding(.horizontal, 9)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(.gray.opacity(0.1))
+            .cornerRadius(4, antialiased: true)
+
+        } else {
+            EmptyView()
         }
     }
 
@@ -193,11 +209,11 @@ struct ProjectDetailView: View {
             Text(text)
                 .font(.body)
                 .padding(.vertical, 5)
-                .padding(.horizontal, 6)
+                .padding(.horizontal, 10)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(.gray.opacity(0.1))
                 .cornerRadius(4, antialiased: true)
-                .padding()
+                //.padding(.vertical)
         } else {
             EmptyView()
         }
@@ -207,9 +223,9 @@ struct ProjectDetailView: View {
 struct ProjectDetailView_Previews: PreviewProvider {
     static var previews: some View {
         let tasks = [
-            ProjectTask(name: "Empty the garbage.",                       completed: false),
+            ProjectTask(name: "Empty the garbage.",                       completed: true),
             ProjectTask(name: "Walk the dog.",                            completed: false),
-            ProjectTask(name: "Sweep the floor.",                         completed: false),
+            ProjectTask(name: "Sweep the floor.",                         completed: true),
             ProjectTask(name: "Clean kitchen sink.",                      completed: false),
             ProjectTask(name: "Clean those filthy refrigerator shelves.", completed: true),
             ProjectTask(name: "Scrub down the dishwasher door.",          completed: false),

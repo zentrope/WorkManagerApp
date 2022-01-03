@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct EmptySelectionView: View {
+
     var systemName: String
     var message: String
+
     var body: some View {
         VStack(spacing: 20) {
             Image(systemName: systemName)
@@ -19,7 +21,7 @@ struct EmptySelectionView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .foregroundColor(Color(nsColor: .tertiaryLabelColor))
-        .background(Color(nsColor: .textBackgroundColor))
+        .background(Color(nsColor: .controlBackgroundColor))
         .toolbar {
             // When no project is selected, show an empty toolbar so that the content column's toolbar items don't slide all the way to the trailing edge of the application window.
 
