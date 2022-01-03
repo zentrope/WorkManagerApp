@@ -117,6 +117,13 @@ struct PersistenceController {
         try updateContext.save()
     }
 
+    func toggle(project: Project) async throws {
+        let projectMO = try await find(project: project.id, context: updateContext)
+        projectMO.isCompleted.toggle()
+        projectMO.dateCompleted = projectMO.isCompleted ? Date() : nil
+        try updateContext.save()
+    }
+
     // MARK: - Queries
 
     enum DataError: Error, LocalizedError {

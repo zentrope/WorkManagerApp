@@ -11,7 +11,7 @@ import SwiftUI
 
 struct ProjectDetailView: View {
 
-    @StateObject private var viewState: ProjectDetailViewState
+    @StateObject private var state: ProjectDetailViewState
 
     // New Task
     @State private var showNewTaskForm = false
@@ -19,11 +19,11 @@ struct ProjectDetailView: View {
     @State private var doSaveTask = false
 
     init(_ project: Project) {
-        self._viewState = StateObject(wrappedValue: ProjectDetailViewState(project: project))
+        self._state = StateObject(wrappedValue: ProjectDetailViewState(project: project))
     }
 
     init(preview: Project) {
-        self._viewState = StateObject(wrappedValue: ProjectDetailViewState(preview: preview))
+        self._state = StateObject(wrappedValue: ProjectDetailViewState(preview: preview))
     }
 
     var body: some View {
@@ -32,28 +32,40 @@ struct ProjectDetailView: View {
 
             HStack(alignment: .center, spacing: 10) {
 
-                VStack(alignment: .leading) {
-                Text(viewState.project.name)
-                    .font(.title2)
-                    .bold()
-                    .foregroundColor(.secondary)
-                    Text(viewState.project.folder.name)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(state.project.name)
+                        .font(.title2)
+                        .bold()
+                        .foregroundColor(.accentColor)
+                    Text(state.project.folder.name)
                         .font(.callout)
                         .foregroundColor(.secondary)
-                        .italic()
                 }
+                .foregroundColor(state.project.isCompleted ? .secondary : Color(nsColor: .textColor))
 
                 Spacer()
-                ProjectStatusIcon(done: viewState.project.doneCount, total: viewState.project.tasks.count)
-                    .foregroundColor(.accentColor)
+                Image(systemName: state.project.isCompleted ? "checkmark.circle" : "circle")
                     .font(.largeTitle)
+                    .foregroundColor(state.project.isCompleted ? .secondary : .orange)
+                    .onTapGesture {
+                        Task {
+                            state.toggle(project: state.project)
+                        }
+                    }
+                    .onHover { inside in
+                        if inside {
+                            NSCursor.pointingHand.push()
+                        } else {
+                            NSCursor.pop()
+                        }
+                    }
             }
             .lineLimit(1)
 
             .padding(.top, 14) // Match content column's title
             .padding([.horizontal, .bottom])
 
-            if viewState.project.tasks.count != 0 {
+            if !state.project.isCompleted && state.project.tasks.count != 0 {
                 StatusView()
                     .padding(.vertical, 5)
                     .padding(.horizontal, 9)
@@ -63,18 +75,19 @@ struct ProjectDetailView: View {
                     .padding()
             }
 
-            if viewState.project.tasks.count == 0 {
+            if state.project.tasks.count == 0 {
                 EmptySelectionView(systemName: "sparkles", message: "No tasks have been added to this project")
-            } else {
+            }
+
+            if state.project.tasks.count > 0 {
                 ScrollView {
 
-                    if viewState.project.todoCount > 0 {
-                        Heading("Available")
-                    }
+                    Heading("Unfinished", renderIf: state.project.todoCount > 0 && state.project.isCompleted)
+                    Heading("Available", renderIf: state.project.todoCount > 0 && !state.project.isCompleted)
 
-                    ForEach(viewState.project.todoTasks, id: \.id) { task in
-                        TaskItemView(task: task) { task in
-                            viewState.toggle(task: task)
+                    ForEach(state.project.todoTasks, id: \.id) { task in
+                        TaskItemView(project: state.project, task: task) { task in
+                            state.toggle(task: task)
                         }
                         .lineLimit(1)
                         .padding(.bottom, 1)
@@ -83,15 +96,12 @@ struct ProjectDetailView: View {
                             Button("Rename") {}
                         }
                     }
-                    .animation(.linear, value: viewState.project.todoTasks)
 
-                    if viewState.project.doneCount > 0 {
-                        Heading("Completed")
-                    }
+                    Heading("Completed", renderIf: state.project.doneCount > 0)
 
-                    ForEach(viewState.project.doneTasks, id: \.id) { task in
-                        TaskItemView(task: task) { task in
-                            viewState.toggle(task: task)
+                    ForEach(state.project.doneTasks, id: \.id) { task in
+                        TaskItemView(project: state.project, task: task) { task in
+                            state.toggle(task: task)
                         }
                         .lineLimit(1)
                         .padding(.bottom, 1)
@@ -100,7 +110,6 @@ struct ProjectDetailView: View {
                             Button("Rename") {}
                         }
                     }
-                    .animation(.linear, value: viewState.project.doneTasks)
                 }
             }
         }
@@ -120,12 +129,12 @@ struct ProjectDetailView: View {
             }
         }
         .sheet(isPresented: $showNewTaskForm, onDismiss: saveTask) {
-            NewTaskView(project: viewState.project.name, folder: viewState.project.folder.name, name: $taskName, ok: $doSaveTask)
+            NewTaskView(project: state.project.name, folder: state.project.folder.name, name: $taskName, ok: $doSaveTask)
         }
-        .navigationTitle(viewState.project.name)
-        .navigationSubtitle(viewState.project.folder.name)
+        .navigationTitle(state.project.name)
+        .navigationSubtitle(state.project.folder.name)
 
-        .alert("ProjectDetailView: \(viewState.error?.localizedDescription ?? "Error")", isPresented: $viewState.hasError) {
+        .alert("ProjectDetailView: \(state.error?.localizedDescription ?? "Error")", isPresented: $state.hasError) {
             Button("Ok", role: .cancel) { }
         }
     }
@@ -134,34 +143,39 @@ struct ProjectDetailView: View {
         defer { taskName = "" }
         guard doSaveTask else { return }
         let task = ProjectTask(name: taskName)
-        viewState.save(task: task)
+        state.save(task: task)
     }
+
 
     @ViewBuilder
     private func StatusView() -> some View {
-        let done = Double(viewState.project.doneCount)
-        let total = Double(viewState.project.tasks.count)
+        let done = Double(state.project.doneCount)
+        let total = Double(state.project.tasks.count)
 
         let value: Double = (done == 0.0 || total == 0.0) ? 0.0 : (done == total) ? 1.0 : done / total
         HStack(alignment: .center, spacing: 5) {
-            Text(String(viewState.project.doneCount))
+            Text(String(state.project.doneCount))
                 .foregroundColor(.secondary)
             ProgressView(value: value, total: 1)
-            Text(String(viewState.project.todoCount))
+            Text(String(state.project.todoCount))
                 .foregroundColor(.secondary)
         }
     }
 
     @ViewBuilder
-    private func Heading(_ text: String) -> some View {
-        Text(text)
-            .font(.body)
-            .padding(.vertical, 5)
-            .padding(.horizontal, 6)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(.gray.opacity(0.1))
-            .cornerRadius(4, antialiased: true)
-            .padding()
+    private func Heading(_ text: String, renderIf render: Bool) -> some View {
+        if render {
+            Text(text)
+                .font(.body)
+                .padding(.vertical, 5)
+                .padding(.horizontal, 6)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(.gray.opacity(0.1))
+                .cornerRadius(4, antialiased: true)
+                .padding()
+        } else {
+            EmptyView()
+        }
     }
 }
 

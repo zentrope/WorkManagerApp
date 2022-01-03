@@ -40,6 +40,17 @@ class ProjectDetailViewState: NSObject, ObservableObject {
         }
     }
 
+    func toggle(project: Project) {
+        Task {
+            do {
+                try await PersistenceController.shared.toggle(project: project)
+            } catch (let error) {
+                log.error("\(error.localizedDescription)")
+                await set(error: error)
+            }
+        }
+    }
+
     func toggle(task: ProjectTask) {
         Task {
             do {

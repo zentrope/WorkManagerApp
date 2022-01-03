@@ -9,45 +9,22 @@ import SwiftUI
 
 struct TaskItemView: View {
 
+    var project: Project
     var task: ProjectTask
     var onToggle: (ProjectTask) -> Void
 
-    @State private var flashChange = false
-
-    private var completed: Bool {
-        flashChange ? !task.isCompleted : task.isCompleted
-    }
-
-    private var completedDate: Date? {
-        (flashChange && task.dateCompleted != nil) ? nil : task.dateCompleted
-    }
-
     var body: some View {
         HStack(alignment: .center, spacing: 10) {
-            Image(systemName: completed ? "circle.inset.filled" : "circle")
-                .foregroundColor(completed ? .secondary : .orange)
-                .opacity(completed ? 0.5 : 1.0)
-                .font(.title2)
-                .onTapGesture {
-                    flashChange = true
-                    Task {
-                        try await Task.sleep(nanoseconds: 1_000_000_000 / 5)
-                        onToggle(task)
-                    }
-                }
+            TaskCheckbox(task: task, project: project)
+                .onTapGesture { onToggle(task) }
                 .onHover(perform: updateCursor)
-            Group {
-                Text(task.name)
-                Spacer()
-                DateView(date: completedDate, format: .nameMonthDayYear, ifNil: "")
-                    .font(.caption)
-            }
-            .foregroundColor(completed ? .secondary : Color(nsColor: .textColor))
-            .opacity(completed ? 0.5 : 1.0)
+            TaskDetail(task: task, project: project)
         }
     }
 
     private func updateCursor(_ inside: Bool) {
+        guard !project.isCompleted else { return }
+
         if inside {
             NSCursor.pointingHand.push()
         } else {
@@ -56,9 +33,40 @@ struct TaskItemView: View {
     }
 }
 
+fileprivate struct TaskDetail: View {
+
+    var task: ProjectTask
+    var project: Project
+
+    var body: some View {
+        Group {
+            Text(task.name)
+            Spacer()
+            DateView(date: task.dateCompleted, format: .nameMonthDayYear, ifNil: "")
+                .font(.caption)
+        }
+        .foregroundColor(task.isCompleted || project.isCompleted ? .secondary : Color(nsColor: .textColor))
+        .opacity(task.isCompleted || project.isCompleted ? 0.5 : 1.0)
+    }
+}
+
+fileprivate struct TaskCheckbox: View {
+
+    var task: ProjectTask
+    var project: Project
+
+    var body: some View {
+        Image(systemName: task.isCompleted ? "circle.inset.filled" : "circle")
+            .foregroundColor(task.isCompleted || project.isCompleted ? .secondary : .orange)
+            .opacity(task.isCompleted || project.isCompleted  ? 0.5 : 1.0)
+            .font(.title2)
+    }
+}
+
 struct TaskItemView_Previews: PreviewProvider {
     static var previews: some View {
-        let task = ProjectTask(name: "Walk the dog.", completed: true)
-        TaskItemView(task: task, onToggle: { task in })
+        let project = Project(name: "Daily chores", folder: Folder(name: "House"))
+        let task = ProjectTask(name: "Walk the dog.", completed: false)
+        TaskItemView(project: project, task: task, onToggle: { task in })
     }
 }

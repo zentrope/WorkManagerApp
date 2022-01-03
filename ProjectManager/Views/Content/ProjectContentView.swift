@@ -81,7 +81,5 @@ struct ProjectContentView: View {
                 .help("Create a new project")
             }
         }
-        .presentedWindowStyle(.titleBar)
-        .presentedWindowToolbarStyle(.unified(showsTitle: true))
     }
 }

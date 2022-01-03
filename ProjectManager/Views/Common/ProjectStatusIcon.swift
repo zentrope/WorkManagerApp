@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// TODO: Change to pie-chart crescent showing completeness
+// Or create a box with a percentage fill (or two boxes), then apply a circle clip.
 struct ProjectStatusIcon: View {
     var done: Int
     var total: Int

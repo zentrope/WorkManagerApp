@@ -8,6 +8,8 @@
 import Foundation
 
 struct ProjectTask: Identifiable, Hashable, CustomStringConvertible {
+    // This value object does not provide a back reference to the actual project to avoid circular de-referencing when converting from Managed Objects. I want to keep these objects as optional-free as possible. I could provide a lazy property to run a query to get the project, but if I start doing that, I'll be half way toward re-implementing Core Data's fault system.
+
     var id: UUID
     var name: String
     var dateCompleted: Date?
