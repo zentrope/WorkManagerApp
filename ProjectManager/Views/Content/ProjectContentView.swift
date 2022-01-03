@@ -44,10 +44,12 @@ struct ProjectContentView: View {
                             NavigationLink(destination: ProjectDetailView(project), tag: project.name, selection: $state.selectedTodo) {
                                 ProjectListItem(project: project)
                             }
-
                             .contextMenu {
                                 Button("Delete") {
                                     projectToDelete = project
+                                }
+                                Button("Mark completed") {
+                                    state.toggle(project: project)
                                 }
                             }
                         }
@@ -62,6 +64,9 @@ struct ProjectContentView: View {
                             .contextMenu {
                                 Button("Delete") {
                                     projectToDelete = project
+                                }
+                                Button("Mark available") {
+                                    state.toggle(project: project)
                                 }
                             }
                         }

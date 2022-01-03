@@ -33,6 +33,18 @@ class ProjectContentViewState: NSObject, ObservableObject {
         }
     }
 
+    func toggle(project: Project) {
+        Task {
+            do {
+                try await PersistenceController.shared.toggle(project: project)
+                await set(selected: project.name)
+            } catch (let error) {
+                log.error("\(error.localizedDescription)")
+                set(error: error)
+            }
+        }
+    }
+
     func swapSelections() {
         if let todo = selectedTodo {
             selectedDone = todo
