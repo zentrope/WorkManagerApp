@@ -28,24 +28,20 @@ struct ProjectDetailView: View {
 
     var body: some View {
 
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 10) {
 
-            HStack(alignment: .center, spacing: 10) {
+            HStack(alignment: .top, spacing: 10) {
 
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(state.project.name)
-                        .font(.title2)
-                        .bold()
-                        .foregroundColor(.accentColor)
-                    Text(state.project.folder.name)
-                        .font(.callout)
-                        .foregroundColor(.secondary)
-                }
-                .foregroundColor(state.project.isCompleted ? .secondary : Color(nsColor: .textColor))
+                Text(state.project.name)
+                    .font(.title2)
+                    .bold()
+                    .foregroundColor(.accentColor)
+                    .foregroundColor(state.project.isCompleted ? .secondary : .accentColor)
 
                 Spacer()
+
                 Image(systemName: state.project.isCompleted ? "checkmark.circle" : "circle")
-                    .font(.largeTitle)
+                    .font(.title2)
                     .foregroundColor(state.project.isCompleted ? .secondary : .orange)
                     .onTapGesture {
                         Task {
@@ -63,7 +59,12 @@ struct ProjectDetailView: View {
             .lineLimit(1)
 
             .padding(.top, 14) // Match content column's title
-            .padding([.horizontal, .bottom])
+            .padding([.horizontal])
+
+            Text(state.project.folder.name)
+                .font(.callout)
+                .foregroundColor(.secondary)
+                .padding(.horizontal)
 
             if !state.project.isCompleted && state.project.tasks.count != 0 {
                 StatusView()

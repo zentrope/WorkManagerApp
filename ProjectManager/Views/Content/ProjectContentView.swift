@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+import OSLog
+
+fileprivate let log = Logger("ProjectContentView")
 
 struct ProjectContentView: View {
 
@@ -24,6 +27,7 @@ struct ProjectContentView: View {
     var body: some View {
         VStack(alignment: .leading) {
             List {
+
                 HStack(alignment: .center) {
                     Text(folder.name)
                         .bold()
@@ -32,15 +36,34 @@ struct ProjectContentView: View {
                 }
                 .foregroundColor(.accentColor)
                 .font(.title2)
-                .padding(.bottom, 10)
+                .padding(.bottom, 0)
 
-                ForEach(folder.projects, id: \.id) { project in
-                    NavigationLink(destination: ProjectDetailView(project), tag: project.name, selection: $state.selectedProject) {
-                        ProjectListItem(project: project)
+                if folder.todo.count > 0 {
+                    Section(header: Text("Available")) {
+                        ForEach(folder.todo, id: \.id) { project in
+                            NavigationLink(destination: ProjectDetailView(project), tag: project.name, selection: $state.selectedTodo) {
+                                ProjectListItem(project: project)
+                            }
+
+                            .contextMenu {
+                                Button("Delete") {
+                                    projectToDelete = project
+                                }
+                            }
+                        }
                     }
-                    .contextMenu {
-                        Button("Delete") {
-                            projectToDelete = project
+                }
+                if folder.done.count > 0 {
+                    Section(header: Text("Completed")) {
+                        ForEach(folder.done, id: \.id) { project in
+                            NavigationLink(destination: ProjectDetailView(project), tag: project.name, selection: $state.selectedDone) {
+                                ProjectDoneItem(project: project)
+                            }
+                            .contextMenu {
+                                Button("Delete") {
+                                    projectToDelete = project
+                                }
+                            }
                         }
                     }
                 }
@@ -48,16 +71,17 @@ struct ProjectContentView: View {
             .listStyle(.inset)
             .alert(item: $projectToDelete) { project in
                 Alert(
-                    title: Text(#"Delete "\#(project.name)" and all its tasks?"#),
-                    message: Text("This cannot be undone"),
-                    primaryButton: .destructive(Text("Delete")) {
-                        state.delete(project: project)                        
-                    },
-                    secondaryButton: .cancel()
-                )
+                    title:           Text(#"Delete "\#(project.name)" and all its tasks?"#),
+                    message:         Text("This cannot be undone"),
+                    primaryButton:   .destructive(Text("Delete")) { state.delete(project: project)  },
+                    secondaryButton: .cancel())
             }
         }
         .frame(minWidth: 300, idealWidth: 300)
+        .onChange(of: folder) { newFolder in
+            // Hack to deal with two lists (done and todo) when a project moves from one list to the other.
+            state.swapSelections()
+        }
         .sheet(isPresented: $showMakeProjectView) {
             if saveNewProject {
                 Task {

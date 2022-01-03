@@ -12,7 +12,9 @@ fileprivate let log = Logger("ProjectContentViewState")
 
 class ProjectContentViewState: NSObject, ObservableObject {
 
-    @Published var selectedProject: String?
+    // Must be 2 of these because we have two ForEach sets of NavLinks and it's possible that the underlying database will move the selected project from one group to the other. If the selection used to be in one ForEach, but isn't on a refresh, the selection is cleared out (because the thing that was selected isn't there).
+    @Published var selectedTodo: String?
+    @Published var selectedDone: String?
     @Published var error: Error?
     @Published var hasError = false
 
@@ -31,16 +33,23 @@ class ProjectContentViewState: NSObject, ObservableObject {
         }
     }
 
+    func swapSelections() {
+        if let todo = selectedTodo {
+            selectedDone = todo
+        } else if let done = selectedDone {
+            selectedTodo = done
+        }
+    }
+
     func delete(project: Project) {
-        if project.name == selectedProject {
+        if project.name == selectedTodo || project.name == selectedDone {
             log.debug("Setting selectProject to nil")
-            selectedProject = nil
+            selectedTodo = nil
+            selectedDone = nil
         }
         Task {
             do {
-                log.debug("Deleting project")
                 try await PersistenceController.shared.delete(project: project)
-                log.debug("Project deleted")
             } catch (let error) {
                 log.debug("\(error.localizedDescription)")
                 set(error: error)
@@ -50,12 +59,13 @@ class ProjectContentViewState: NSObject, ObservableObject {
 
     @MainActor
     private func set(selected: String?) {
-        self.selectedProject = selected
+        // Only one of the lists will have the selected project name, so it's ok to set both.
+        selectedDone = selected
+        selectedTodo = selected
     }
 
     private func set(error: Error) {
         self.hasError = true
         self.error = error
     }
-
 }
