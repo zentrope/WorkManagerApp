@@ -10,6 +10,7 @@ import OSLog
 
 fileprivate let log = Logger("ProjectListViewState")
 
+@MainActor
 final class ProjectListViewState: NSObject, ObservableObject {
 
     @Published var projects = [Project]()

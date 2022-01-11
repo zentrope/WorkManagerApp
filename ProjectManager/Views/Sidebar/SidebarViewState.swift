@@ -11,6 +11,7 @@ import OSLog
 
 fileprivate let log = Logger("SidebarViewState")
 
+@MainActor
 final class SidebarViewState: NSObject, ObservableObject {
 
     @Published var folders = [SidebarItem]()
@@ -27,7 +28,9 @@ final class SidebarViewState: NSObject, ObservableObject {
 
     override init() {
         super.init()
-        reload()
+        Task {
+            await reload()
+        }
     }
 
     func delete(folder id: UUID) {
