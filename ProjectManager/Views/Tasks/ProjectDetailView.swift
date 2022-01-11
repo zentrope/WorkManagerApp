@@ -13,6 +13,10 @@ struct ProjectDetailView: View {
 
     @StateObject private var state: ProjectDetailViewState
 
+    // TODO: Use a binding to a UUID to refresh this view
+    // var selection: UUID?
+
+
     // Task maintenance
     @State private var showNewTaskForm = false
     @State private var showEditTaskForm = false
@@ -96,14 +100,15 @@ struct ProjectDetailView: View {
                 } label: {
                     Image(systemName: "plus")
                 }
+                .keyboardShortcut("n", modifiers: [.control, .command])
                 .help("Create a new task")
             }
         }
         .sheet(isPresented: $showNewTaskForm, onDismiss: saveTask) {
-            TaskDataForm(mode: .create, project: state.project.name, folder: state.project.folder.name, name: $taskName, ok: $doSaveTask)
+            TaskDataForm(isEdit: false, name: $taskName, ok: $doSaveTask)
         }
         .sheet(isPresented: $showEditTaskForm, onDismiss: editTask) {
-            TaskDataForm(mode: .update, project: state.project.name, folder: state.project.folder.name, name: $taskName, ok: $doSaveTask)
+            TaskDataForm(isEdit: true, name: $taskName, ok: $doSaveTask)
         }
         .navigationTitle(state.project.name)
         .navigationSubtitle(state.project.folder.name)

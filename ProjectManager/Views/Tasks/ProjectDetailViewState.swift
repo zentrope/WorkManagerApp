@@ -10,6 +10,7 @@ import OSLog
 
 fileprivate let log = Logger("ProjectDetailViewState")
 
+@MainActor
 class ProjectDetailViewState: NSObject, ObservableObject {
 
     @Published var project: Project
@@ -23,8 +24,11 @@ class ProjectDetailViewState: NSObject, ObservableObject {
 
     init(project: Project) {
         self.project = project
+        log.debug("Initializing project: [\(project.name)]")
         super.init()
+        reload()
         NotificationCenter.default.addObserver(forName: .NSManagedObjectContextDidSave, object: nil, queue: .main) { [weak self] msg in
+            log.debug("In callback, noticed that something has changed: \(msg)")
             self?.reload()
         }
     }
@@ -35,7 +39,7 @@ class ProjectDetailViewState: NSObject, ObservableObject {
                 try await PersistenceController.shared.update(task: task, name: name)
             } catch (let error) {
                 log.error("\(error.localizedDescription)")
-                await set(error: error)
+                set(error: error)
             }
         }
     }
@@ -46,7 +50,7 @@ class ProjectDetailViewState: NSObject, ObservableObject {
                 try await PersistenceController.shared.add(task: task, to: project)
             } catch (let error) {
                 log.error("\(error.localizedDescription)")
-                await set(error: error)
+                set(error: error)
             }
         }
     }
@@ -57,7 +61,7 @@ class ProjectDetailViewState: NSObject, ObservableObject {
                 try await PersistenceController.shared.toggle(project: project)
             } catch (let error) {
                 log.error("\(error.localizedDescription)")
-                await set(error: error)
+                set(error: error)
             }
         }
     }
@@ -68,7 +72,7 @@ class ProjectDetailViewState: NSObject, ObservableObject {
                 try await PersistenceController.shared.toggle(task: task)
             } catch (let error) {
                 log.error("\(error.localizedDescription)")
-                await set(error: error)
+                set(error: error)
             }
         }
     }
@@ -77,19 +81,17 @@ class ProjectDetailViewState: NSObject, ObservableObject {
         Task {
             do {
                 let mo = try await PersistenceController.shared.find(project: project.id)
-                await set(project: Project(mo: mo))
+                set(project: Project(mo: mo))
             } catch (let error) {
-                await set(error: error)
+                set(error: error)
             }
         }
     }
 
-    @MainActor
     private func set(project: Project) {
         self.project = project
     }
 
-    @MainActor
     private func set(error: Error) {
         self.error = error
         self.hasError = true

@@ -15,22 +15,35 @@ struct SidebarView: View {
     @StateObject private var state = SidebarViewState()
 
     @State private var showDeleteConfirm = false
-    @State private var folderToDelete: Folder?
+    @State private var folderToDelete: SidebarItem?
 
     @State private var showEditFolderSheet = false
-    @State private var folderToEdit: Folder?
+    @State private var folderToEdit: SidebarItem?
     @State private var showNewFolderSheet = false
     @State private var newFolderName = ""
     @State private var saveOk = false
 
+    @State private var active = true
+
     var body: some View {
         VStack(alignment: .leading) {
+
             List {
+                Section(header: Text("Filters")) {
+                    NavigationLink(destination: ProjectListView(filter: SidebarItem.available), isActive: $active) {
+                        Label(SidebarItem.available.name, systemImage: "line.3.horizontal.decrease.circle")
+                    }
+
+                    NavigationLink(destination: ProjectListView(filter: SidebarItem.completed)) {
+                        Label(SidebarItem.completed.name, systemImage: "line.3.horizontal.decrease.circle")
+                    }
+                }
+
                 Section(header: Text("Folders")) {
                     ForEach(state.folders, id: \.id) { folder in
-                        NavigationLink(destination: ProjectContentView(folder: folder), tag: folder.name, selection: $state.selectedFolder) {
+                        NavigationLink(destination: ProjectListView(filter: folder)) {
                             Label(folder.name, systemImage: "folder")
-                                .badge(folder.projects.count)
+                                .badge(folder.available)
                         }
                         .contextMenu {
                             Button("Rename") {
@@ -39,7 +52,7 @@ struct SidebarView: View {
                                 saveOk = false
                                 showEditFolderSheet.toggle()
                             }
-                            if folder.projects.count == 0 {
+                            if folder.count == 0 {
                                 Button("Delete") {
                                     folderToDelete = folder
                                     showDeleteConfirm.toggle()
@@ -51,6 +64,7 @@ struct SidebarView: View {
             }
             .listStyle(.sidebar)
             .alert(item: $folderToDelete) { deleteAlert(folder: $0) }
+
             Spacer()
             HStack(alignment: .center) {
                 Button {
@@ -71,45 +85,44 @@ struct SidebarView: View {
         .sheet(isPresented: $showEditFolderSheet, onDismiss: handleFolderUpdate) {
             FolderForm(mode: .update, name: $newFolderName, ok: $saveOk)
         }
-        .alert("\(state.error?.localizedDescription ?? "Error!")", isPresented: $state.hasError) {}
+        .alert(state.error?.localizedDescription ?? "Error!", isPresented: $state.hasError) {}
     }
 
-    private func deleteAlert(folder: Folder) -> Alert {
+    private func deleteAlert(folder: SidebarItem) -> Alert {
         Alert(
             title: Text("Delete '\(folder.name)'?"),
             message: Text("This cannot be undone."),
             primaryButton: .destructive(Text("Delete")) {
-                state.delete(folder: folder)
+                state.delete(folder: folder.id)
             },
             secondaryButton: .cancel()
         )
     }
 
     private func handleFolderSave() {
-        if saveOk {
-            let name = newFolderName.trimmingCharacters(in: .whitespacesAndNewlines)
-            if name.isEmpty {
-                log.error("Cannot create a folder with a blank folder name.")
-                return
-            }
-            state.save(folder: Folder(name: name))
+        defer { newFolderName = "" }
+        guard saveOk else { return }
+        let name = newFolderName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if name.isEmpty {
+            log.error("Cannot create a folder with a blank folder name.")
+            return
         }
-        newFolderName = ""
+        state.save(folder: Folder(name: name))
     }
 
     private func handleFolderUpdate() {
         defer { newFolderName = "" }
-        guard let folder = folderToEdit else {
-            log.error("Unable to retrieve the folder we're updating.")
+
+        guard saveOk else { return }
+        guard let folder = folderToEdit else { return }
+
+        let name = newFolderName.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if name.isEmpty {
+            log.error("Cannot update to a blank folder name.")
             return
         }
-        if saveOk {
-            let name = newFolderName.trimmingCharacters(in: .whitespacesAndNewlines)
-            if name.isEmpty {
-                log.error("Cannot update to a blank folder name.")
-                return
-            }
-            state.update(folder: folder, name: name)
-        }
+
+        state.rename(folder: folder.id, name: name)
     }
 }

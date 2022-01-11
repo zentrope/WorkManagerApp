@@ -5,6 +5,7 @@
 //  Created by Keith Irwin on 12/31/21.
 //
 
+import Combine
 import CoreData
 import OSLog
 
@@ -12,15 +13,13 @@ fileprivate let log = Logger("SidebarViewState")
 
 final class SidebarViewState: NSObject, ObservableObject {
 
-    @Published var folders = [Folder]()
-    @Published var selectedFolder: String?
+    @Published var folders = [SidebarItem]()
     @Published var error: Error?
     @Published var hasError = false
 
-    private lazy var folderCursor: NSFetchedResultsController<FolderMO> = {
+    private lazy var cursor: NSFetchedResultsController<FolderMO> = {
         let fetcher = FolderMO.fetchRequest()
         fetcher.sortDescriptors = [ NSSortDescriptor(key: "name", ascending: true)]
-
         let cursor = NSFetchedResultsController(fetchRequest: fetcher, managedObjectContext: PersistenceController.shared.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         cursor.delegate = self
         return cursor
@@ -29,17 +28,12 @@ final class SidebarViewState: NSObject, ObservableObject {
     override init() {
         super.init()
         reload()
-
-        NotificationCenter.default.addObserver(forName: .NSManagedObjectContextDidSave, object: nil, queue: .main) { [weak self] msg in
-            self?.reload()
-        }
     }
 
-    func delete(folder: Folder) {
+    func delete(folder id: UUID) {
         Task {
             do {
-                try await PersistenceController.shared.delete(folder: folder)
-                await select(folderName: folders.first?.name)
+                try await PersistenceController.shared.delete(folder: id)
             } catch (let error) {
                 set(error: error)
             }
@@ -50,19 +44,20 @@ final class SidebarViewState: NSObject, ObservableObject {
         Task {
             do {
                 try await PersistenceController.shared.insert(folder: folder)
-                await select(folderName: folder.name)
             } catch (let error) {
                 set(error: error)
             }
         }
     }
 
-    func update(folder: Folder, name: String) {
-        let folderToSelect = folder.name == selectedFolder ? name : selectedFolder
+    func rename(folder id: UUID, name: String) {
+        let newName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        if newName.isEmpty {
+            return
+        }
         Task {
             do {
-                try await PersistenceController.shared.update(folder: folder, name: name)
-                await select(folderName: folderToSelect)
+                try await PersistenceController.shared.update(folder: id, name: newName)
             } catch (let error) {
                 set(error: error)
             }
@@ -71,20 +66,12 @@ final class SidebarViewState: NSObject, ObservableObject {
 
     private func reload() {
         do {
-            try folderCursor.performFetch()
-            folders = (folderCursor.fetchedObjects ?? []).map { .init(folderMO: $0) }
-            if selectedFolder == nil {
-                selectedFolder = folders.first?.name
-            }
+            try cursor.performFetch()
+            self.folders = (cursor.fetchedObjects ?? []).map { .init(folder: $0) }
         } catch (let error) {
             set(error: error)
             log.error("\(error.localizedDescription)")
         }
-    }
-
-    @MainActor
-    private func select(folderName: String?) {
-        self.selectedFolder = folderName
     }
 
     private func set(error: Error) {
@@ -95,6 +82,7 @@ final class SidebarViewState: NSObject, ObservableObject {
 
 extension SidebarViewState: NSFetchedResultsControllerDelegate {
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        log.debug("Reloading due to a cursor change notification.")
         reload()
     }
 }

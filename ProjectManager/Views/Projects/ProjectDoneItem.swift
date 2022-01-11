@@ -25,5 +25,6 @@ struct ProjectDoneItem: View {
             Image(systemName: "circle.inset.filled")
         }
         .padding(.vertical, 4)
+        .lineLimit(1)
     }
 }

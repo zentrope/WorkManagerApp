@@ -15,7 +15,7 @@ struct ProjectStatusIcon: View {
     var body: some View {
         switch done {
             case 0:
-                Image(systemName: "sparkles")
+                Image(systemName: "shippingbox")
             case total:
                 Image(systemName: "circle.inset.filled")
             default:

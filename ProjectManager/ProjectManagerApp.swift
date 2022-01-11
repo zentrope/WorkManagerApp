@@ -29,10 +29,10 @@ struct ProjectManagerApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .frame(minWidth: 1024, minHeight: 400)
+                .frame(minWidth: 800, idealWidth: 980, minHeight: 400, idealHeight: 600)
         }
         .windowStyle(.titleBar)
-        .windowToolbarStyle(.unified(showsTitle: false))
+        .windowToolbarStyle(.unified(showsTitle: true))
         .commands {
             SidebarCommands()
         }

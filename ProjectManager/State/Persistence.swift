@@ -8,20 +8,22 @@
 import CoreData
 import OSLog
 
-// https://www.avanderlee.com/swift/constraints-core-data-entities/
+// TODO: Spotlight Integration
+// https://www.raywenderlich.com/26871651-set-up-core-spotlight-with-core-data-getting-started
 
 struct PersistenceController {
 
     static let shared = PersistenceController()
 
-    private let log = Logger( "PersistenceController")
+    private let log = Logger("PersistenceController")
 
-    let container: NSPersistentCloudKitContainer
+    var container: NSPersistentCloudKitContainer
 
-    private var updateContext: NSManagedObjectContext
+    private(set) var updateContext: NSManagedObjectContext
 
     init() {
         let container = NSPersistentCloudKitContainer(name: "ProjectManager")
+
         container.loadPersistentStores { storeDescription, error in
             container.viewContext.automaticallyMergesChangesFromParent = true
 
@@ -48,8 +50,8 @@ struct PersistenceController {
     }
 
     /// Change folder name.
-    func update(folder: Folder, name: String) async throws {
-        let folderMO = try await find(folder: folder.id, context: updateContext)
+    func update(folder: UUID, name: String) async throws {
+        let folderMO = try await find(folder: folder, context: updateContext)
         folderMO.name = name
         try updateContext.save()
     }
@@ -58,6 +60,12 @@ struct PersistenceController {
     func update(task: ProjectTask, name: String) async throws {
         let taskMO = try await find(task: task.id, context: updateContext)
         taskMO.name = name
+        try updateContext.save()
+    }
+
+    func rename(project: UUID, withNewName: String) async throws {
+        let projectMO = try await find(project: project, context: updateContext)
+        projectMO.name = withNewName
         try updateContext.save()
     }
 
@@ -78,8 +86,23 @@ struct PersistenceController {
         }
     }
 
-    func delete(folder: Folder) async throws {
-        let folderMO = try await find(folder: folder.id, context: updateContext)
+    @discardableResult
+    func insert(projectNamed name: String, inFolder id: UUID) async throws -> UUID {
+        log.debug(#"creating project "\#(name)" in folder "\#(id)""#)
+        let projectId = UUID()
+        let folderMO = try await find(folder: id, context: updateContext)
+        let projectMO = ProjectMO(context: updateContext)
+        projectMO.id = projectId
+        projectMO.name = name
+        projectMO.isCompleted = false
+        projectMO.dateCompleted = nil
+        projectMO.folder = folderMO
+        try updateContext.save()
+        return projectId
+    }
+
+    func delete(folder id: UUID) async throws {
+        let folderMO = try await find(folder: id, context: updateContext)
         if folderMO.projects?.count != 0 {
             throw DataError.FolderNotEmpty
         }
@@ -87,12 +110,10 @@ struct PersistenceController {
         try updateContext.save()
     }
 
-    func delete(project: Project) async throws {
-        let projectMO = try await find(project: project.id, context: updateContext)
-        try await updateContext.perform(schedule: .enqueued) {
-            updateContext.delete(projectMO)
-            try updateContext.save()
-        }
+    func delete(project uuid: UUID) async throws {
+        let projectMO = try await find(project: uuid, context: updateContext)
+        updateContext.delete(projectMO)
+        try updateContext.save()
     }
 
     /// Create a project task

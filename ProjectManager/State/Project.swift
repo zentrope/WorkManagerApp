@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 struct Project: Identifiable, Hashable, CustomStringConvertible {
     var id: UUID
     var name: String
