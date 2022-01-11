@@ -41,8 +41,6 @@ fileprivate struct TaskDetail: View {
     var body: some View {
         Group {
             Text(task.name)
-            // If I allow textSelection, the context menu doesn't work.
-                // .textSelection(.enabled)
             Spacer()
             DateView(date: task.dateCompleted, format: .nameMonthDayYear, ifNil: "")
                 .font(.caption)

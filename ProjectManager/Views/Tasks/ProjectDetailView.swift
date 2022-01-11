@@ -20,9 +20,11 @@ struct ProjectDetailView: View {
     // Task maintenance
     @State private var showNewTaskForm = false
     @State private var showEditTaskForm = false
+
     @State private var taskName = ""
     @State private var doSaveTask = false
     @State private var taskToEdit: ProjectTask?
+    @State private var taskToDelete: ProjectTask?
 
     init(_ project: Project) {
         self._state = StateObject(wrappedValue: ProjectDetailViewState(project: project))
@@ -34,58 +36,50 @@ struct ProjectDetailView: View {
 
     var body: some View {
 
-        VStack(alignment: .leading) {
-            LocationView()
-                .padding([.top, .horizontal])
-                .padding(.bottom, 2)
-
-            TitleView()
-                .padding(.horizontal)
-
-            StatusView(render: !state.project.isCompleted && state.project.tasks.count != 0)
-                .padding()
-
-            ScrollView {
-
-                Heading("Unfinished", renderIf: state.project.todoCount > 0 && state.project.isCompleted)
-                    .padding([.horizontal, .bottom, .top])
-
-                Heading("Available", renderIf: state.project.todoCount > 0 && !state.project.isCompleted)
-                    .padding([.horizontal, .bottom, .top])
-
-                ForEach(state.project.todoTasks, id: \.id) { task in
-                    TaskItemView(project: state.project, task: task) { task in
-                        state.toggle(task: task)
-                    }
-                    .padding(.horizontal)
-                    .lineLimit(1)
+        VStack {
+            List {
+                LocationView()
+                    .padding([.top])
                     .padding(.bottom, 2)
-                    .contextMenu {
-                        Button("Rename", action: { handleRename(task) })
-                    }
-                    .onHover { inside in
-                        if inside { NSCursor.contextualMenu.push() } else { NSCursor.pop() }
+
+                TitleView()
+
+                StatusView(render: !state.project.isCompleted && state.project.tasks.count != 0)
+                    .padding(.top)
+
+                if !state.project.todoTasks.isEmpty {
+                    Section(header: Text("Available")) {
+                        ForEach(state.project.todoTasks, id: \.id) { task in
+                            TaskItemView(project: state.project, task: task) { task in
+                                state.toggle(task: task)
+                            }
+                            .padding(.horizontal)
+                            .lineLimit(1)
+                            .padding(.bottom, 2)
+                            .contextMenu { ContextMenu(task: task) }
+                        }
                     }
                 }
 
-                Heading("Completed", renderIf: state.project.doneCount > 0)
-                    .padding()
-                    .padding(.top, 5) // a little extra
-
-                ForEach(state.project.doneTasks, id: \.id) { task in
-                    TaskItemView(project: state.project, task: task) { task in
-                        state.toggle(task: task)
-                    }
-                    .lineLimit(1)
-                    .padding(.horizontal)
-                    .padding(.bottom, 2)
-                    .contextMenu {
-                        Button("Rename", action: { handleRename(task) })
-                    }
-                    .onHover { inside in
-                        if inside { NSCursor.contextualMenu.push() } else { NSCursor.pop() }
+                if !state.project.doneTasks.isEmpty {
+                    Section(header: Text("Completed")) {
+                        ForEach(state.project.doneTasks, id: \.id) { task in
+                            TaskItemView(project: state.project, task: task) { task in
+                                state.toggle(task: task)
+                            }
+                            .lineLimit(1)
+                            .padding(.horizontal)
+                            .padding(.bottom, 2)
+                            .contextMenu { ContextMenu(task: task) }
+                        }
                     }
                 }
+            }
+            .listStyle(.inset)
+            .alert(item: $taskToDelete) { task in
+                Alert(title: Text("Delete '\(task.name)'?"), message: Text("This cannot be undone."), primaryButton: .cancel(), secondaryButton: .destructive(Text("Delete Task")) {
+                    state.delete(task: task)
+                })
             }
         }
         .frame(minWidth: 400, maxWidth: .infinity, minHeight: 400, maxHeight: .infinity)
@@ -147,6 +141,20 @@ struct ProjectDetailView: View {
     }
 
     @ViewBuilder
+    private func ContextMenu(task: ProjectTask) -> some View {
+        Button("Rename") {
+            handleRename(task)
+        }
+        Button("Delete") {
+            taskToDelete = task
+        }
+        Button("Copy") {
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(task.name, forType: .string)
+        }
+    }
+
+    @ViewBuilder
     private func LocationView() -> some View {
         HStack(alignment: .center, spacing: 6) {
             Image(systemName: "folder")
@@ -203,22 +211,6 @@ struct ProjectDetailView: View {
             .background(.gray.opacity(0.1))
             .cornerRadius(4, antialiased: true)
 
-        } else {
-            EmptyView()
-        }
-    }
-
-    @ViewBuilder
-    private func Heading(_ text: String, renderIf render: Bool) -> some View {
-        if render {
-            Text(text)
-                .font(.body)
-                .padding(.vertical, 5)
-                .padding(.horizontal, 10)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(.gray.opacity(0.1))
-                .cornerRadius(4, antialiased: true)
-                //.padding(.vertical)
         } else {
             EmptyView()
         }

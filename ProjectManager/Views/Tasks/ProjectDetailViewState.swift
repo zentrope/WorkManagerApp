@@ -24,12 +24,20 @@ class ProjectDetailViewState: NSObject, ObservableObject {
 
     init(project: Project) {
         self.project = project
-        log.debug("Initializing project: [\(project.name)]")
         super.init()
         reload()
         NotificationCenter.default.addObserver(forName: .NSManagedObjectContextDidSave, object: nil, queue: .main) { [weak self] msg in
-            log.debug("In callback, noticed that something has changed: \(msg)")
             self?.reload()
+        }
+    }
+
+    func delete(task: ProjectTask) {
+        Task {
+            do {
+                try await PersistenceController.shared.delete(task: task.id)
+            } catch (let error) {
+                set(error: error)
+            }
         }
     }
 
@@ -38,7 +46,6 @@ class ProjectDetailViewState: NSObject, ObservableObject {
             do {
                 try await PersistenceController.shared.update(task: task, name: name)
             } catch (let error) {
-                log.error("\(error.localizedDescription)")
                 set(error: error)
             }
         }
@@ -49,7 +56,6 @@ class ProjectDetailViewState: NSObject, ObservableObject {
             do {
                 try await PersistenceController.shared.add(task: task, to: project)
             } catch (let error) {
-                log.error("\(error.localizedDescription)")
                 set(error: error)
             }
         }
@@ -60,7 +66,6 @@ class ProjectDetailViewState: NSObject, ObservableObject {
             do {
                 try await PersistenceController.shared.toggle(project: project)
             } catch (let error) {
-                log.error("\(error.localizedDescription)")
                 set(error: error)
             }
         }
@@ -71,7 +76,6 @@ class ProjectDetailViewState: NSObject, ObservableObject {
             do {
                 try await PersistenceController.shared.toggle(task: task)
             } catch (let error) {
-                log.error("\(error.localizedDescription)")
                 set(error: error)
             }
         }
@@ -95,5 +99,6 @@ class ProjectDetailViewState: NSObject, ObservableObject {
     private func set(error: Error) {
         self.error = error
         self.hasError = true
+        log.error("\(error.localizedDescription)")
     }
 }

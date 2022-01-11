@@ -116,6 +116,12 @@ struct PersistenceController {
         try updateContext.save()
     }
 
+    func delete(task uuid: UUID) async throws {
+        let taskMO = try await find(task: uuid, context: updateContext)
+        updateContext.delete(taskMO)
+        try updateContext.save()
+    }
+
     /// Create a project task
     func add(task: ProjectTask, to project: Project) async throws {
         log.debug("Upserting \(task)")
