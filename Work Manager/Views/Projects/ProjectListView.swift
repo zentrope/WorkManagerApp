@@ -104,14 +104,14 @@ struct ProjectListView: View {
 
     @ViewBuilder
     func ContextMenu(project: Project) -> some View {
-        Button("Delete") {
-            projectToDelete = project
-        }
         Button("Rename") {
             newProjectName = project.name
             newProjectFolder = project.folder.id
             projectToRename = project
             showRenameProjectView.toggle()
+        }
+        Button("Delete") {
+            projectToDelete = project
         }
     }
 }

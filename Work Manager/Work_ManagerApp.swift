@@ -27,7 +27,7 @@ import SwiftUI
 // LINK: https://www.swiftdevjournal.com/disable-a-text-field-in-a-swiftui-list-until-tapping-edit-button/
 
 @main
-struct ProjectManagerApp: App {
+struct Work_ManagerApp: App {
 
     var body: some Scene {
         WindowGroup {
