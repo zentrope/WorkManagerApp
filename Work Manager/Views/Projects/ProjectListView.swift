@@ -58,7 +58,7 @@ struct ProjectListView: View {
             }
         }
         .frame(minWidth: 300, idealWidth: 300)
-        .navigationTitle("/ \(filter.isFolder ? "folder" : "filter") / \(filter.name)".lowercased())
+        .navigationTitle("\(filter.name) — Work Manager")
         .navigationSubtitle("\(state.projects.count) projects")
         .onAppear { state.set(filter: filter) }
         .alert(state.error?.localizedDescription ?? "Error", isPresented: $state.hasError) {}

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 import OSLog
 
 fileprivate let log = Logger("ProjectDetailViewState")
@@ -14,19 +15,37 @@ fileprivate let log = Logger("ProjectDetailViewState")
 class ProjectDetailViewState: NSObject, ObservableObject {
 
     @Published var project: Project
+    @Published var notes = ""
     @Published var error: Error?
     @Published var hasError = false
 
+    private var subscribers = Set<AnyCancellable>()
+
     init(preview project: Project) {
         self.project = project
+        self.notes = project.notes.string
         super.init()
     }
 
     init(project: Project) {
         self.project = project
+        self.notes = project.notes.string
         super.init()
+        self.$notes
+            .debounce(for: .seconds(2), scheduler: RunLoop.main)
+            .sink { [weak self] newNotes in
+                guard let self = self else { return }
+                if self.project.notes.string != newNotes {
+                    self.update(note: newNotes)
+                }
+            }
+            .store(in: &subscribers)
+
         reload()
-        NotificationCenter.default.addObserver(forName: .NSManagedObjectContextDidSave, object: nil, queue: .main) { [weak self] msg in
+
+        // TODO: Use fetched results controller to avoid cloudkit churn.
+        // TODO: https://stackoverflow.com/a/40375966
+        NotificationCenter.default.addObserver(forName: .NSManagedObjectContextObjectsDidChange, object: PersistenceController.shared.container.viewContext, queue: .main) { [weak self] msg in
             self?.reload()
         }
     }
@@ -81,19 +100,32 @@ class ProjectDetailViewState: NSObject, ObservableObject {
         }
     }
 
-    private func reload() {
+    func update(note: NSAttributedString) {
         Task {
             do {
-                let mo = try await PersistenceController.shared.find(project: project.id)
-                set(project: Project(mo: mo))
+                log.debug("Updating note for project '\(self.project.name)'.")
+                try await PersistenceController.shared.update(project: project.id, withNote: note)
             } catch (let error) {
+                log.error("\(error.localizedDescription)")
                 set(error: error)
             }
         }
     }
 
-    private func set(project: Project) {
-        self.project = project
+    func update(note: String) {
+        update(note: NSAttributedString(string: note))
+    }
+
+    private func reload() {
+        Task {
+            do {
+                let mo = try await PersistenceController.shared.find(project: project.id)
+                self.project = Project(mo: mo)
+                self.notes = project.notes.string
+            } catch (let error) {
+                set(error: error)
+            }
+        }
     }
 
     private func set(error: Error) {

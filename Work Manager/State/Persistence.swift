@@ -24,7 +24,6 @@ struct PersistenceController {
 
         container.loadPersistentStores { storeDescription, error in
             container.viewContext.automaticallyMergesChangesFromParent = true
-
             container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
             if let error = error as NSError? {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
@@ -48,7 +47,7 @@ struct PersistenceController {
             let folderMO = FolderMO(context: context)
             folderMO.id = folder.id
             folderMO.name = folder.name
-            try context.save()
+            try context.commit()
         }
     }
 
@@ -58,7 +57,7 @@ struct PersistenceController {
         try await context.perform {
             let folderMO = try find(folder: folder, context: context)
             folderMO.name = name
-            try context.save()
+            try context.commit()
         }
     }
 
@@ -68,7 +67,7 @@ struct PersistenceController {
         try await context.perform {
             let taskMO = try find(task: task.id, context: context)
             taskMO.name = name
-            try context.save()
+            try context.commit()
         }
     }
 
@@ -77,7 +76,16 @@ struct PersistenceController {
         try await context.perform {
             let projectMO = try find(project: project, context: context)
             projectMO.name = withNewName
-            try context.save()
+            try context.commit()
+        }
+    }
+
+    func update(project id: UUID, withNote note: NSAttributedString) async throws {
+        let context = newContext()
+        try await context.perform {
+            let projectMO = try find(project: id, context: context)
+            projectMO.notes = note
+            try context.commit()
         }
     }
 
@@ -94,7 +102,7 @@ struct PersistenceController {
             projectMO.isCompleted = project.isCompleted
             projectMO.dateCompleted = project.dateCompleted
             projectMO.folder = folderMO
-            try context.save()
+            try context.commit()
         }
     }
 
@@ -110,7 +118,7 @@ struct PersistenceController {
             projectMO.isCompleted = false
             projectMO.dateCompleted = nil
             projectMO.folder = folderMO
-            try context.save()
+            try context.commit()
         }
     }
 
@@ -122,7 +130,7 @@ struct PersistenceController {
                 throw DataError.FolderNotEmpty
             }
             context.delete(folderMO)
-            try context.save()
+            try context.commit()
         }
     }
 
@@ -131,7 +139,7 @@ struct PersistenceController {
         try await context.perform {
             let projectMO = try find(project: uuid, context: context)
             context.delete(projectMO)
-            try context.save()
+            try context.commit()
         }
     }
 
@@ -140,7 +148,7 @@ struct PersistenceController {
         try await context.perform {
             let taskMO = try find(task: uuid, context: context)
             context.delete(taskMO)
-            try context.save()
+            try context.commit()
         }
     }
 
@@ -156,7 +164,7 @@ struct PersistenceController {
             taskMO.isCompleted = task.isCompleted
             taskMO.dateCompleted = task.dateCompleted
             taskMO.project = projectMO
-            try context.save()
+            try context.commit()
         }
     }
 
@@ -171,7 +179,7 @@ struct PersistenceController {
             } else {
                 taskMO.dateCompleted = nil
             }
-            try context.save()
+            try context.commit()
         }
     }
 
@@ -181,7 +189,7 @@ struct PersistenceController {
             let projectMO = try find(project: project.id, context: context)
             projectMO.isCompleted.toggle()
             projectMO.dateCompleted = projectMO.isCompleted ? Date() : nil
-            try context.save()
+            try context.commit()
         }
     }
 
@@ -232,5 +240,14 @@ struct PersistenceController {
 
     func find(project id: UUID) async throws -> ProjectMO {
         try find(project: id, context: container.viewContext)
+    }
+}
+
+extension NSManagedObjectContext {
+
+    func commit() throws {
+        if hasChanges {
+            try save()
+        }
     }
 }

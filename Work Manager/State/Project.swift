@@ -6,12 +6,16 @@
 //
 
 import Foundation
+import OSLog
+
+fileprivate let log = Logger("Project")
 
 struct Project: Identifiable, Hashable, CustomStringConvertible {
     var id: UUID
     var name: String
     var isCompleted: Bool
     var dateCompleted: Date?
+    var notes: NSAttributedString
     var folder: Folder
     var tasks: [ProjectTask]
 
@@ -31,6 +35,7 @@ struct Project: Identifiable, Hashable, CustomStringConvertible {
         self.name = name
         self.isCompleted = false
         self.dateCompleted = nil
+        self.notes = NSAttributedString(string: "")
         self.folder = folder
         self.tasks = tasks
         self.doneCount = tasks.filter { $0.isCompleted }.count
@@ -45,6 +50,7 @@ struct Project: Identifiable, Hashable, CustomStringConvertible {
         self.name = mo.name ?? "Project \(self.id)"
         self.isCompleted = mo.isCompleted
         self.dateCompleted = mo.dateCompleted
+        self.notes = mo.notes ?? NSAttributedString(string: "")
 
         // This is a hack to prevent a circular dependency graph.
         if let folder = mo.folder,

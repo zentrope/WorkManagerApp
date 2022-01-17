@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+import OSLog
+
+fileprivate let log = Logger("ProjectDetailView")
 
 // TODO: Look at ScratchPad app for NSTextView editor help.
 
@@ -26,6 +29,9 @@ struct ProjectDetailView: View {
     @State private var taskToEdit: ProjectTask?
     @State private var taskToDelete: ProjectTask?
 
+    @State private var showProjectNotes = false
+//    @State private var notes = ""
+
     init(_ project: Project) {
         self._state = StateObject(wrappedValue: ProjectDetailViewState(project: project))
     }
@@ -37,49 +43,66 @@ struct ProjectDetailView: View {
     var body: some View {
 
         VStack {
-            List {
-                LocationView()
-                    .padding([.top])
-                    .padding(.bottom, 2)
+            HSplitView {
+                List {
+                    LocationView()
+                        .padding([.top])
+                        .padding(.bottom, 2)
 
-                TitleView()
+                    TitleView()
 
-                StatusView(render: !state.project.isCompleted && state.project.tasks.count != 0)
-                    .padding(.top)
+                    StatusView(render: !state.project.isCompleted && state.project.tasks.count != 0)
+                        .padding(.top)
 
-                if !state.project.todoTasks.isEmpty {
-                    Section(header: Text("Available")) {
-                        ForEach(state.project.todoTasks, id: \.id) { task in
-                            TaskItemView(project: state.project, task: task) { task in
-                                state.toggle(task: task)
+                    if !state.project.todoTasks.isEmpty {
+                        Section(header: Text("Available")) {
+                            ForEach(state.project.todoTasks, id: \.id) { task in
+                                TaskItemView(project: state.project, task: task) { task in
+                                    state.toggle(task: task)
+                                }
+                                .padding(.horizontal)
+                                .lineLimit(1)
+                                .padding(.bottom, 2)
+                                .contextMenu { ContextMenu(task: task) }
                             }
-                            .padding(.horizontal)
-                            .lineLimit(1)
-                            .padding(.bottom, 2)
-                            .contextMenu { ContextMenu(task: task) }
+                        }
+                    }
+
+                    if !state.project.doneTasks.isEmpty {
+                        Section(header: Text("Completed")) {
+                            ForEach(state.project.doneTasks, id: \.id) { task in
+                                TaskItemView(project: state.project, task: task) { task in
+                                    state.toggle(task: task)
+                                }
+                                .lineLimit(1)
+                                .padding(.horizontal)
+                                .padding(.bottom, 2)
+                                .contextMenu { ContextMenu(task: task) }
+                            }
                         }
                     }
                 }
-
-                if !state.project.doneTasks.isEmpty {
-                    Section(header: Text("Completed")) {
-                        ForEach(state.project.doneTasks, id: \.id) { task in
-                            TaskItemView(project: state.project, task: task) { task in
-                                state.toggle(task: task)
-                            }
-                            .lineLimit(1)
-                            .padding(.horizontal)
-                            .padding(.bottom, 2)
-                            .contextMenu { ContextMenu(task: task) }
-                        }
-                    }
+                .listStyle(.inset)
+                .frame(minWidth: 450)
+                .alert(item: $taskToDelete) { task in
+                    Alert(title: Text("Delete '\(task.name)'?"), message: Text("This cannot be undone."), primaryButton: .cancel(), secondaryButton: .destructive(Text("Delete Task")) {
+                        state.delete(task: task)
+                    })
                 }
-            }
-            .listStyle(.inset)
-            .alert(item: $taskToDelete) { task in
-                Alert(title: Text("Delete '\(task.name)'?"), message: Text("This cannot be undone."), primaryButton: .cancel(), secondaryButton: .destructive(Text("Delete Task")) {
-                    state.delete(task: task)
-                })
+
+                if showProjectNotes {
+                    VStack {
+                        TextEditor(text: $state.notes)
+                            .font(.body.monospaced())
+                            .padding()
+                            .onDisappear {
+                                state.update(note: state.notes)
+                            }
+                    }
+                    .background(Color(nsColor: .textBackgroundColor))
+                    .frame(minWidth: 400, maxWidth: .infinity, alignment: .leading)
+                    //.layoutPriority(1)
+                }
             }
         }
         .frame(minWidth: 400, maxWidth: .infinity, minHeight: 400, maxHeight: .infinity)
@@ -97,6 +120,15 @@ struct ProjectDetailView: View {
                 .keyboardShortcut("n", modifiers: [.control, .command])
                 .help("Create a new task")
             }
+
+            ToolbarItem {
+                Button {
+                    showProjectNotes.toggle()
+                } label: {
+                    Image(systemName: "sidebar.trailing")
+                }
+                .help("Toggle project notes editor")
+            }
         }
         .sheet(isPresented: $showNewTaskForm, onDismiss: saveTask) {
             TaskDataForm(isEdit: false, name: $taskName, ok: $doSaveTask)
@@ -104,9 +136,8 @@ struct ProjectDetailView: View {
         .sheet(isPresented: $showEditTaskForm, onDismiss: editTask) {
             TaskDataForm(isEdit: true, name: $taskName, ok: $doSaveTask)
         }
-        .navigationTitle(state.project.name)
+        .navigationTitle("\(state.project.name) — Work Manager")
         .navigationSubtitle(state.project.folder.name)
-
         .alert("ProjectDetailView: \(state.error?.localizedDescription ?? "Error")", isPresented: $state.hasError) {
             Button("Ok", role: .cancel) { }
         }
@@ -139,6 +170,12 @@ struct ProjectDetailView: View {
         }
         state.rename(task: todo, name: name)
     }
+
+}
+
+// MARK: - Supplemental Views
+
+extension ProjectDetailView {
 
     @ViewBuilder
     private func ContextMenu(task: ProjectTask) -> some View {
@@ -216,6 +253,8 @@ struct ProjectDetailView: View {
         }
     }
 }
+
+// MARK: - Preview Provider
 
 struct ProjectDetailView_Previews: PreviewProvider {
     static var previews: some View {
