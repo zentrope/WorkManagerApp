@@ -43,10 +43,11 @@ class ProjectDetailViewState: NSObject, ObservableObject {
 
         reload()
 
-        // TODO: Use fetched results controller to avoid cloudkit churn.
-        // TODO: https://stackoverflow.com/a/40375966
         NotificationCenter.default.addObserver(forName: .NSManagedObjectContextObjectsDidChange, object: PersistenceController.shared.container.viewContext, queue: .main) { [weak self] msg in
-            self?.reload()
+            guard let self = self else { return }
+            if CoreDataUtils.changed(msg: msg, projectId: self.project.id) {
+                self.reload()
+            }
         }
     }
 

@@ -1,5 +1,5 @@
 //
-//  Logger+Ext.swift
+//  Logger.swift
 //  ProjectManager
 //
 //  Created by Keith Irwin on 12/27/21.

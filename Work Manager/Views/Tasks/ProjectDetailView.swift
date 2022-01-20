@@ -16,10 +16,6 @@ struct ProjectDetailView: View {
 
     @StateObject private var state: ProjectDetailViewState
 
-    // TODO: Use a binding to a UUID to refresh this view
-    // var selection: UUID?
-
-
     // Task maintenance
     @State private var showNewTaskForm = false
     @State private var showEditTaskForm = false
@@ -30,7 +26,6 @@ struct ProjectDetailView: View {
     @State private var taskToDelete: ProjectTask?
 
     @State private var showProjectNotes = false
-//    @State private var notes = ""
 
     init(_ project: Project) {
         self._state = StateObject(wrappedValue: ProjectDetailViewState(project: project))
@@ -93,6 +88,7 @@ struct ProjectDetailView: View {
                 if showProjectNotes {
                     VStack {
                         TextEditor(text: $state.notes)
+                            .disableAutocorrection(false)
                             .font(.body.monospaced())
                             .padding()
                             .onDisappear {
