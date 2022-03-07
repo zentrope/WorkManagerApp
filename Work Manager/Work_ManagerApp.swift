@@ -7,18 +7,6 @@
 
 import SwiftUI
 
-// IDEA: Make task area a text view but force every line to be a checkbox
-// TODO: Export entire data set?
-// TODO: Figure out an export format.
-// TODO: Add filters (all, 2021, 2022)
-// TODO: Move project to new folder (drag drop?)
-// TODO: Allow task date override
-// TODO: Open to last selected project?  @AppStorage
-// TODO: Open to last selected folder?  @AppStorage
-// TODO: Create unique default task names (New Project 1, New Project 2, etc).
-
-// LINK: https://www.swiftdevjournal.com/disable-a-text-field-in-a-swiftui-list-until-tapping-edit-button/
-
 @main
 struct Work_ManagerApp: App {
 

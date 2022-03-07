@@ -241,6 +241,32 @@ struct PersistenceController {
     func find(project id: UUID) async throws -> ProjectMO {
         try find(project: id, context: container.viewContext)
     }
+
+    func allProjects() throws -> [ProjectMO] {
+        guard let request = container.managedObjectModel.fetchRequestTemplate(forName: "AllProjects") else {
+            throw QueryError.NoFetchRequest("AllProjects")
+        }
+        if let projects = try container.viewContext.fetch(request) as? [ProjectMO] {
+            return projects
+        }
+        throw QueryError.FetchFailed
+    }
+}
+
+extension PersistenceController {
+    enum QueryError: Error, LocalizedError {
+        case NoFetchRequest(String)
+        case FetchFailed
+
+        var errorDescription: String? {
+            switch self {
+                case .NoFetchRequest(let name):
+                    return "No fetch request named '\(name)' was found."
+                case .FetchFailed:
+                    return "Unable to complete a fetch."
+            }
+        }
+    }
 }
 
 extension NSManagedObjectContext {

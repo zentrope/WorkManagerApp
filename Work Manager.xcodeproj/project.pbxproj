@@ -22,6 +22,8 @@
 		539F9E35277EE98E00AC02B0 /* ProjectDetailViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539F9E34277EE98E00AC02B0 /* ProjectDetailViewState.swift */; };
 		53A438122795F46C00DDD71E /* NSAttributedStringTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A438112795F46C00DDD71E /* NSAttributedStringTransformer.swift */; };
 		53C4840A279383BC001B7D72 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53C48409279383BC001B7D72 /* CloudKit.framework */; };
+		53C659EC27D5D5DE00177CD7 /* FlatTaskListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53C659EB27D5D5DE00177CD7 /* FlatTaskListView.swift */; };
+		53C659EE27D5D63200177CD7 /* FlatTaskListViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53C659ED27D5D63200177CD7 /* FlatTaskListViewState.swift */; };
 		53CCD0B727796835000F3A05 /* Work_ManagerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53CCD0B627796835000F3A05 /* Work_ManagerApp.swift */; };
 		53CCD0B927796835000F3A05 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53CCD0B827796835000F3A05 /* ContentView.swift */; };
 		53CCD0BB27796836000F3A05 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53CCD0BA27796836000F3A05 /* Assets.xcassets */; };
@@ -56,6 +58,8 @@
 		539F9E34277EE98E00AC02B0 /* ProjectDetailViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectDetailViewState.swift; sourceTree = "<group>"; };
 		53A438112795F46C00DDD71E /* NSAttributedStringTransformer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSAttributedStringTransformer.swift; sourceTree = "<group>"; };
 		53C48409279383BC001B7D72 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		53C659EB27D5D5DE00177CD7 /* FlatTaskListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlatTaskListView.swift; sourceTree = "<group>"; };
+		53C659ED27D5D63200177CD7 /* FlatTaskListViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlatTaskListViewState.swift; sourceTree = "<group>"; };
 		53CCD0B327796835000F3A05 /* Work Manager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Work Manager.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		53CCD0B627796835000F3A05 /* Work_ManagerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Work_ManagerApp.swift; sourceTree = "<group>"; };
 		53CCD0B827796835000F3A05 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -150,6 +154,15 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		53C659EA27D5D5B700177CD7 /* Flat */ = {
+			isa = PBXGroup;
+			children = (
+				53C659EB27D5D5DE00177CD7 /* FlatTaskListView.swift */,
+				53C659ED27D5D63200177CD7 /* FlatTaskListViewState.swift */,
+			);
+			path = Flat;
+			sourceTree = "<group>";
+		};
 		53CCD0AA27796835000F3A05 = {
 			isa = PBXGroup;
 			children = (
@@ -192,6 +205,7 @@
 		53CCD0D327796DB6000F3A05 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				53C659EA27D5D5B700177CD7 /* Flat */,
 				53536D4A277FD1C000AC0015 /* Common */,
 				53536D48277FD16F00AC0015 /* Main */,
 				5383A25427868C9A0009132D /* Projects */,
@@ -295,6 +309,7 @@
 			files = (
 				532273C4278168AA00DE8DF0 /* ProjectStatusIcon.swift in Sources */,
 				5342F80F2799116C0083DA17 /* CoreDataUtils.swift in Sources */,
+				53C659EE27D5D63200177CD7 /* FlatTaskListViewState.swift in Sources */,
 				53CCD0C027796836000F3A05 /* Persistence.swift in Sources */,
 				53CCD0B927796835000F3A05 /* ContentView.swift in Sources */,
 				539F9E2E277ECD3600AC02B0 /* TaskDataForm.swift in Sources */,
@@ -311,6 +326,7 @@
 				5383A25627868CBF0009132D /* ProjectListViewState.swift in Sources */,
 				539F9E35277EE98E00AC02B0 /* ProjectDetailViewState.swift in Sources */,
 				53023BED277C24AA006E4845 /* Work-Manager.xcdatamodeld in Sources */,
+				53C659EC27D5D5DE00177CD7 /* FlatTaskListView.swift in Sources */,
 				5383A2532786880F0009132D /* SidebarItem.swift in Sources */,
 				5383A25C2786A8B00009132D /* RenameStringView.swift in Sources */,
 				53CCD0B727796835000F3A05 /* Work_ManagerApp.swift in Sources */,
@@ -451,7 +467,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 106;
 				DEVELOPMENT_ASSET_PATHS = "\"Work Manager/Preview Content\"";
 				DEVELOPMENT_TEAM = 5Y5389EUC6;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -481,7 +497,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 106;
 				DEVELOPMENT_ASSET_PATHS = "\"Work Manager/Preview Content\"";
 				DEVELOPMENT_TEAM = 5Y5389EUC6;
 				ENABLE_HARDENED_RUNTIME = YES;
